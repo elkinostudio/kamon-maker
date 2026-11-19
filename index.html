@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kamon Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: quiet, crafted, like a dyer's pattern book
+   IDEA: a kamon workbench — the crest sits on the table, tools within reach, nothing scrolls
+   PICTURE: the live crest, as large as the screen allows
+   COLOUR and TYPE: washi off-white, sumi ink, vermilion seal, gold hairlines; Shippori Mincho + Zen Kaku Gothic New
+   LAYOUT: desktop = pickers | crest | adjust+colour+meaning; phone = crest above, tabbed tool tray below */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3eee3,#151412);--card:light-dark(#fbf8f1,#1e1c19);--ink:light-dark(#1d1b18,#ece6d8);
+--mute:light-dark(#6d665b,#a39b8c);--line:light-dark(#ddd4c2,#37332d);--shu:#c8402e;--gold:#b8923f;
+--sel:light-dark(#1d1b18,#ece6d8);--selink:light-dark(#fbf8f1,#151412)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Zen Kaku Gothic New",system-ui,sans-serif;overflow:hidden}
+h1,h2,h3{font-family:"Shippori Mincho",serif;font-weight:700;margin:0}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
+#root{height:100dvh}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
+/* header */
+.top{display:flex;align-items:center;gap:10px;padding:10px max(2.5vw,12px);border-bottom:1px solid var(--line)}
+.seal{width:34px;height:34px;background:var(--shu);color:#fff7ea;display:grid;place-items:center;font:700 18px "Shippori Mincho",serif;border-radius:4px;flex:none}
+.top h1{font-size:clamp(19px,2.4vw,24px);line-height:1;white-space:nowrap}
+.top .acts{margin-left:auto;display:flex;gap:6px}
+.btn{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.ink{background:var(--sel);border-color:var(--sel);color:var(--selink)}
+.btn.primary{background:var(--shu);border-color:var(--shu);color:#fff7ea}
+/* body grid */
+.body{display:grid;min-height:0;gap:12px;padding:12px max(2.5vw,12px);
+ grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto min(236px,36dvh);
+ grid-template-areas:"stage" "tabs" "panel"}
+.panel{grid-area:panel;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto;overscroll-behavior:contain}
+.panel[hidden]{display:none}
+.panel h3{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.panel h3 em{font:400 12.5px "Zen Kaku Gothic New",sans-serif;color:var(--mute);font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{grid-area:tabs;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
+.tabs button{min-height:38px;border:0;border-radius:999px;background:transparent;font-size:13px;font-weight:500;color:var(--mute)}
+.tabs button[aria-selected=true]{background:var(--sel);color:var(--selink)}
+@media(min-width:960px) and (min-height:600px){
+ .body{grid-template-columns:minmax(270px,320px) minmax(0,1fr) minmax(270px,320px);grid-template-rows:auto auto minmax(0,1fr);
+  grid-template-areas:"frame stage adjust" "motif stage color" "motif stage meaning"}
+ .tabs{display:none}
+ .panel[hidden]{display:block}
+ .p-frame{grid-area:frame}.p-motif{grid-area:motif}.p-adjust{grid-area:adjust}.p-color{grid-area:color}.p-meaning{grid-area:meaning}
+ .panel{padding:14px 16px}
+ .panel h3{font-size:16px}
+}
+/* stage */
+.stage{grid-area:stage;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:0;position:relative}
+.crestbox{min-height:0;display:grid;place-items:center;position:relative;touch-action:pan-y;container-type:size}
+.crestbox .art{width:min(100cqw - 72px,100cqh,600px);aspect-ratio:1;display:grid}
+@media(min-width:960px){.crestbox .art{width:min(100cqw - 104px,100cqh,600px)}}
+.crestbox svg{width:100%;height:100%;display:block;filter:drop-shadow(0 14px 22px rgba(40,30,10,.22))}
+.crestbox.pop svg{animation:pop .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{transform:scale(.95);opacity:.5}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.crestbox.pop svg{animation:none}}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);font-size:20px;line-height:1;display:grid;place-items:center}
+.nav.l{left:0}.nav.r{right:0}
+.nav:hover{border-color:var(--ink)}
+.namebar{display:flex;align-items:center;gap:12px;justify-content:space-between;max-width:640px;width:100%;margin:0 auto}
+.name{min-width:0;flex:1}
+.name .sym{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.namebar .btn{flex:none;min-height:44px}
+.name .jp{font:700 clamp(18px,2.6vw,28px)/1.15 "Shippori Mincho",serif}
+.name .ro{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.name .sym{font-size:13px;color:var(--ink);margin-top:2px}
+.name .sym b{color:var(--gold);font-weight:500}
+/* pickers */
+.grid{display:grid;gap:6px;grid-template-columns:repeat(6,minmax(0,1fr))}
+.grid.m{grid-template-columns:repeat(5,minmax(0,1fr))}
+.opt{border:1px solid var(--line);background:transparent;border-radius:9px;padding:5px 3px;display:grid;justify-items:center;gap:2px;min-height:44px;transition:border-color .15s,background .15s}
+.opt .th{width:100%;max-width:46px;aspect-ratio:1;display:block}
+.opt .th svg{width:100%;height:100%;display:block;border-radius:5px}
+.opt .lb{display:none;font-size:11.5px;line-height:1.2;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opt:hover{border-color:var(--mute)}
+.opt[aria-pressed=true]{border-color:var(--shu);background:color-mix(in srgb,var(--shu) 9%,transparent);box-shadow:inset 0 0 0 1px var(--shu)}
+@media(min-width:960px) and (min-height:600px){
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.m{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .opt .lb{display:block}.opt .th{max-width:44px}
+}
+@media(min-width:600px) and (max-width:959px){.opt .lb{display:block}}
+/* adjust */
+.row{display:grid;grid-template-columns:4.6em minmax(0,1fr) 3.4em;align-items:center;gap:8px;min-height:42px}
+.row label{font-size:13px;color:var(--mute)}
+.row output{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--shu);height:28px}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{min-height:34px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:transparent;font-size:12.5px}
+.chip:hover{border-color:var(--ink)}
+/* colour */
+.presets{display:grid;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.preset{display:flex;align-items:center;gap:8px;min-height:40px;padding:4px 8px;border-radius:9px;border:1px solid var(--line);background:transparent;text-align:left}
+.preset i{width:24px;height:24px;border-radius:50%;flex:none;border:1px solid #0002;display:grid;place-items:center}
+.preset i b{width:11px;height:11px;border-radius:50%}
+.preset span{font-size:12px;line-height:1.2}
+.preset[aria-pressed=true]{border-color:var(--shu);box-shadow:inset 0 0 0 1px var(--shu)}
+.colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+.color{display:flex;align-items:center;gap:8px;min-height:42px;border:1px solid var(--line);border-radius:9px;padding:3px 8px}
+.color input[type=color]{width:30px;height:30px;border:0;padding:0;background:none;flex:none}
+.color span{font-size:12.5px;color:var(--mute)}
+.color code{font-size:12px;margin-left:auto}
+.check{display:flex;align-items:center;gap:8px;min-height:38px;font-size:13px;margin-top:4px}
+.check input{width:18px;height:18px;accent-color:var(--shu)}
+/* meaning */
+.p-meaning{border-top:3px solid var(--gold)}
+.kw{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 8px}
+.kw span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--gold)}
+.p-meaning p{margin:6px 0 0;font-size:14px}
+.p-meaning .lead{font-family:"Shippori Mincho",serif;font-size:16px;line-height:1.45;margin-top:0}
+.p-meaning small{display:block;color:var(--mute);margin-top:10px;font-size:12px}
+/* overlays */
+.modal{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:16px;z-index:9}
+.modal .box{background:var(--card);border-radius:14px;padding:18px;max-width:420px;width:100%;display:grid;gap:10px;max-height:90dvh;overflow:auto}
+.modal img{width:100%;border-radius:8px;border:1px solid var(--line)}
+.modal p{margin:0;font-size:14px;color:var(--mute)}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--sel);color:var(--selink);padding:9px 16px;border-radius:999px;font-size:14px;z-index:10;white-space:nowrap}
+@media(max-width:420px){.top h1{font-size:18px}.btn{padding:0 11px}.top .hide-s{display:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+{
+const {useState,useEffect,useMemo,useRef,useCallback}=React;
+const html=htm.bind(React.createElement);
+const f=n=>+n.toFixed(2);
+
+/* ---------- geometry ---------- */
+const circ=r=>`M${r} 0A${r} ${r} 0 1 0 ${-r} 0A${r} ${r} 0 1 0 ${r} 0Z`;
+const circAt=(cx,r)=>`M${cx+r} 0A${r} ${r} 0 1 0 ${cx-r} 0A${r} ${r} 0 1 0 ${cx+r} 0Z`;
+const poly=pts=>'M'+pts.map(p=>p.map(f).join(' ')).join('L')+'Z';
+const ngon=(n,r,a0=0)=>Array.from({length:n},(_,i)=>{const a=a0+i*2*Math.PI/n;return[r*Math.cos(a),r*Math.sin(a)]});
+const octa=(h,c)=>[[-h+c,-h],[h-c,-h],[h,-h+c],[h,h-c],[h-c,h],[-h+c,h],[-h,h-c],[-h,-h+c]];
+const shrink=(pts,k)=>{const cx=pts.reduce((s,p)=>s+p[0],0)/pts.length,cy=pts.reduce((s,p)=>s+p[1],0)/pts.length;return pts.map(([x,y])=>[cx+(x-cx)*k,cy+(y-cy)*k])};
+const rot=(d,s)=>`<g transform="rotate(${d})">${s}</g>`;
+const P='var(--p)';
+
+/* ---------- frames ---------- */
+const FRAMES=[
+ {id:'none',name:'None',en:'',ro:'',jp:'',fit:1.28,d:''},
+ {id:'maru',name:'Maru',en:'Circle',ro:'Maru ni',jp:'丸に',fit:1,d:circ(95)+circ(83),
+  kw:['harmony','completeness'],text:'The circle is the simplest and most familiar enclosure in Japanese heraldry — a single line that gathers the motif into a whole.'},
+ {id:'futae',name:'Futae-maru',en:'Double Circle',ro:'Futae-maru ni',jp:'二重丸に',fit:.94,d:circ(95)+circ(87)+circ(83)+circ(79.5),
+  kw:['continuity','unity'],text:'A doubled ring: a heavy outer line with a fine one inside, reading as a layered, enduring boundary.'},
+ {id:'sumikiri',name:'Sumikiri-kaku',en:'Cut-corner Square',ro:'Sumikiri-kaku ni',jp:'隅切り角に',fit:1.02,d:poly(octa(90,28))+poly(octa(79,24)),
+  kw:['order','refinement'],text:'A square with its corners trimmed away — firm and orderly, but with the hard edges softened.'},
+ {id:'kikko',name:'Kikkō',en:'Tortoise Shell',ro:'Kikkō ni',jp:'亀甲に',fit:.9,d:poly(ngon(6,97))+poly(ngon(6,88))+poly(ngon(6,84))+poly(ngon(6,80.5)),
+  kw:['longevity','good fortune'],text:'The hexagon imitates the plates of a tortoise shell, an animal tied to long life. Izumo Taisha encloses its crest in a double tortoise shell; one explanation links the hexagon to Genbu, the turtle-and-snake guardian of the north.'},
+ {id:'sumitate',name:'Sumitate-kaku',en:'Diamond Square',ro:'Sumitate-kaku ni',jp:'隅立て角に',fit:.8,d:poly(ngon(4,97,-Math.PI/2))+poly(ngon(4,84,-Math.PI/2)),
+  kw:['balance','resolve'],text:'A square stood on its corner — the same shape as a plain square, made alert and upright.'}
+];
+
+/* ---------- motifs (fit within radius ≈ 72) ---------- */
+function tomoe(){const R=70,q=24,rh=(R-q)/2,th=95*Math.PI/180,Rt=62,N=28,pt=(r,a)=>[r*Math.cos(a),r*Math.sin(a)],o=[],n=[];
+ for(let i=0;i<=N;i++){const t=i/N;o.push(pt(R-(R-Rt)*t*t,th*t));n.push(pt(q+(Rt-q)*Math.pow(t,.55),th*t))}
+ return 'M'+[...o,...n.reverse().slice(1)].map(p=>p.map(f).join(' ')).join('L')+`A${rh} ${rh} 0 0 1 ${R} 0Z`}
+const arrow=`<path d="M0-76L-9-52L-3-55V34H3V-55L9-52Z"/><path d="M-3 26L-14 38V78L-3 66ZM3 26L14 38V78L3 66Z"/>`+
+ [42,52,62].map(y=>`<path d="M-14 ${y+2}L-3 ${y-9}M14 ${y+2}L3 ${y-9}" stroke="${P}" stroke-width="1.6"/>`).join('');
+const sep=`stroke="${P}" stroke-width="2.6" stroke-linejoin="round"`;
+const leaf=`<path d="M0 0C34 4 42 36 0 60C-42 36-34 4 0 0Z" ${sep}/><path d="M0 8V50M0 20L-14 28M0 20L14 28M0 34L-12 42M0 34L12 42" stroke="${P}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+const bud=(y,x)=>`<path d="M${x-9} ${y+5}Q${x-10} ${y-7} ${x} ${y-10}Q${x+10} ${y-7} ${x+9} ${y+5}Q${x} ${y+1} ${x-9} ${y+5}Z" ${sep}/>`;
+const stalk=(n)=>`<path d="M0 4V${-14-n*12}" stroke="currentColor" stroke-width="3.4"/>`+Array.from({length:n},(_,i)=>bud(-12-i*12,i%2?3:-3)).join('')+`<circle cy="${-18-n*12}" r="3.4"/>`;
+const wring=(cx)=>`<path d="${circAt(cx,44)}${circAt(cx,33)}" fill-rule="evenodd" ${sep}/>`;
+const half=(cx)=>{const a=d=>[Math.cos(d*Math.PI/180),Math.sin(d*Math.PI/180)],[c1,s1]=a(28),[c2,s2]=a(88),R=44,r=33,pt=(rr,c,s)=>`${f(cx+rr*c)} ${f(rr*s)}`;
+ return `<path d="M${pt(R,c1,s1)}A${R} ${R} 0 0 1 ${pt(R,c2,s2)}L${pt(r,c2,s2)}A${r} ${r} 0 0 0 ${pt(r,c1,s1)}Z"/><path d="M${pt(R,c1,s1)}A${R} ${R} 0 0 1 ${pt(R,c2,s2)}M${pt(r,c2,s2)}A${r} ${r} 0 0 0 ${pt(r,c1,s1)}" fill="none" stroke="${P}" stroke-width="2.6"/>`};
+const dia=(cx,cy,a)=>poly([[cx,cy-a],[cx+a,cy],[cx,cy+a],[cx-a,cy]]);
+
+const MOTIFS=[
+ {id:'uroko',name:'Mitsu-uroko',en:'Three Scales',jp:'三つ鱗',kw:['protection','strength'],
+  svg:()=>{const T=ngon(3,74,-Math.PI/2),m=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2],ab=m(T[0],T[1]),bc=m(T[1],T[2]),ca=m(T[2],T[0]);
+   return `<g transform="translate(0 6)"><path d="${[[T[0],ab,ca],[ab,T[1],bc],[ca,bc,T[2]]].map(t=>poly(shrink(t,.97))).join('')}"/></g>`},
+  text:'Three triangles stacked like dragon scales — the crest of the Hōjō, regents of the Kamakura shogunate. A legend in the war chronicle Taiheiki tells how Hōjō Tokimasa prayed at Enoshima and found three scales left behind; Enoshima Shrine’s own crest was designed after this story.'},
+ {id:'bishi',name:'Takeda-bishi',en:'Four Diamonds',jp:'武田菱',kw:['discipline','martial honour'],
+  svg:()=>{const a=78,b=54,c=[0,0],Q=[[0,-b],[a/2,-b/2],[a,0],[a/2,b/2],[0,b],[-a/2,b/2],[-a,0],[-a/2,-b/2]];
+   return `<path d="${[[Q[0],Q[1],c,Q[7]],[Q[1],Q[2],Q[3],c],[c,Q[3],Q[4],Q[5]],[Q[7],c,Q[5],Q[6]]].map(t=>poly(shrink(t,.9))).join('')}"/>`},
+  text:'A large diamond split into four — the crest of the Takeda clan of Kai province, the house of the warlord Takeda Shingen. The word hishi (diamond) is also the name of the water chestnut.'},
+ {id:'ume',name:'Umebachi',en:'Plum Blossom',jp:'梅鉢',kw:['perseverance','learning'],
+  svg:()=>ngon(5,41,-Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="22.5"/>`).join('')+`<circle r="11.5"/>`+ngon(5,17.5,Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="2.6"/>`).join(''),
+  text:'A stylised plum blossom of five round petals. The plum flowers in late winter, so it stands for endurance. Plum crests belong to the cult of the scholar Sugawara no Michizane: Kitano Tenmangū in Kyoto, head shrine of Tenjin worship, uses a “star plum” variant.'},
+ {id:'tomoe',name:'Mitsu-domoe',en:'Comma Swirl',jp:'三つ巴',kw:['cycles of life','guarding'],
+  svg:()=>{const p=tomoe();return [0,120,240].map(a=>rot(a,`<path d="${p}"/>`)).join('')},
+  text:'Three comma shapes turning around a centre — one of the most common shrine crests, long associated with shrines to Hachiman, the deity the Minamoto warrior clan took as its guardian.'},
+ {id:'kikyo',name:'Kikyō',en:'Bellflower',jp:'桔梗',kw:['sincerity','constancy'],
+  svg:()=>{const pet=`<path d="M0-5L-27.5-43Q-29-64 0-76Q29-64 27.5-43Z"/><path d="M0-16V-48" stroke="${P}" stroke-width="2.4" stroke-linecap="round"/>`;
+   return [0,72,144,216,288].map(a=>rot(a,pet)).join('')+`<circle r="6" fill="${P}"/>`},
+  text:'The five pointed petals of the Chinese bellflower, a classic flower of autumn. It is associated with the Toki clan of Mino province and with Akechi Mitsuhide, who came from a branch of the Toki.'},
+ {id:'ya',name:'Chigai-ya',en:'Crossed Arrows',jp:'違い矢',kw:['determination','courage'],
+  svg:()=>rot(-28,arrow)+rot(28,arrow),
+  text:'Two arrows crossed. Arrow crests belong to the warrior tradition; an arrow flies only forward, so the image reads as resolve and a straight path.'},
+ {id:'kuyo',name:'Kuyō',en:'Nine Stars',jp:'九曜',kw:['guidance','heavenly order'],
+  svg:()=>`<circle r="21"/>`+ngon(8,52,-Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="15.5"/>`).join(''),
+  text:'Nine circles for nine heavenly bodies — sun, moon, five planets and two “shadow” stars tied to eclipses — once painted on carriages and robes for protection. Hosokawa Tadaoki is said to have received it from Oda Nobunaga, and it became the Hosokawa crest.'},
+ {id:'hanabishi',name:'Hanabishi',en:'Flower Diamond',jp:'花菱',kw:['elegance','grace'],
+  svg:()=>{const p=`<path d="M0-7C-16-12-26-34-14-50C-8-56-2-54 0-46C2-54 8-56 14-50C26-34 16-12 0-7Z" ${sep}/>`;
+   return `<g transform="scale(1.32 1.04)">${[0,90,180,270].map(a=>rot(a,p)).join('')}</g>`+ngon(4,7,Math.PI/4).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="2" />`).join('')},
+  text:'Four heart-shaped petals set in a diamond — an old court pattern. At Izumo Taisha a four-petalled flower divided by sword blades sits inside the double tortoise shell of the shrine’s crest.'},
+ {id:'sakura',name:'Sakura',en:'Cherry Blossom',jp:'桜',kw:['renewal','transience'],
+  svg:()=>{const p=`<path d="M0-8C-23-16-32-46-17-66L0-55L17-66C32-46 23-16 0-8Z" ${sep}/><path d="M0-12V-22" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`;
+   return [0,72,144,216,288].map(a=>rot(a,p)).join('')+`<circle r="6" fill="${P}"/><circle r="2.6"/>`},
+  text:'Five notched cherry petals. The blossoms open briefly and fall together, and Japanese poetry has long read them as an image of beauty that does not last.'},
+ {id:'kiri',name:'Go-san no Kiri',en:'Paulownia',jp:'五三桐',kw:['honour','authority'],
+  svg:()=>`<g transform="translate(0 5) scale(.93)">`+
+   `<g transform="translate(0 10) rotate(70) scale(.92)">${leaf}</g><g transform="translate(0 10) rotate(-70) scale(.92)">${leaf}</g><g transform="translate(0 8)">${leaf}</g>`+
+   `<g transform="translate(0 -2)">${stalk(5)}</g><g transform="translate(-24 -2) rotate(-30)">${stalk(3)}</g><g transform="translate(24 -2) rotate(30)">${stalk(3)}</g></g>`,
+  text:'Three leaves beneath three flower stalks bearing 3-5-3 blossoms. Paulownia crests were once linked with the imperial court and were later used by Toyotomi Hideyoshi; a 5-7 version is today the emblem of the Japanese government.'},
+ {id:'wachigai',name:'Wa-chigai',en:'Linked Rings',jp:'輪違い',kw:['bonds','partnership'],
+  svg:()=>wring(-23)+wring(23)+half(-23),
+  text:'Two rings passed through each other. Each keeps its own shape, yet neither can leave — a simple picture of a bond.'},
+ {id:'yotsume',name:'Yotsume-yui',en:'Four Eyes',jp:'四つ目結',kw:['kinship','steadfastness'],
+  svg:()=>`<path fill-rule="evenodd" d="${[[0,-34],[34,0],[0,34],[-34,0]].map(([x,y])=>dia(x,y,30)+dia(x,y,12)).join('')}"/>`,
+  text:'Four square “eyes” of tie-dyed cloth arranged as a diamond. The four-eye knot is the crest of the Sasaki clan of Ōmi and its branches, such as the Rokkaku.'},
+ {id:'igeta',name:'Igeta',en:'Well Curb',jp:'井桁',kw:['source','abundance'],
+  svg:()=>{const b=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" ${sep}/>`;
+   return `<g transform="rotate(45)">${b(-27,-64,14,128)+b(13,-64,14,128)+b(-64,-27,128,14)+b(-64,13,128,14)}</g>`},
+  text:'The crossed beams of a wooden well curb. A well meant a dependable source; the Sumitomo group still uses a diamond-turned well curb as its mark, explained as a symbol of a spring.'},
+ {id:'guruma',name:'Genji-guruma',en:'Court Wheel',jp:'源氏車',kw:['refinement','turning fortune'],
+  svg:()=>`<path fill-rule="evenodd" d="${circ(71)+circ(60)+circ(17)+circ(8)}"/>`+Array.from({length:12},(_,i)=>rot(i*30,`<path d="M-2.6-16L-3.6-61H3.6L2.6-16Z"/>`)).join(''),
+  text:'The wheel of a Heian courtier’s ox-cart. It is called the Genji wheel because such carts fill the painted scenes of The Tale of Genji; wheel crests recall the splendour of court life.'},
+ {id:'mitsuboshi',name:'Ichimonji Mitsuboshi',en:'One & Three Stars',jp:'一文字に三つ星',kw:['unity','aim'],
+  svg:()=>`<g transform="scale(.92)"><path d="M-54-50Q-56-56-46-56H50Q58-56 54-48Q50-40 44-40H-46Q-52-40-54-50Z"/><circle cy="-4" r="19"/><circle cx="-24" cy="38" r="19"/><circle cx="24" cy="38" r="19"/></g>`,
+  text:'The character 一 (“one”) above three stars — the crest of the Mōri clan, lords of Chōshū, still seen throughout the family’s former residence in Hōfu.'}
+];
+
+const PRESETS=[
+ {id:'sumi',name:'Sumi & Washi',ink:'#1c1a17',paper:'#f4eee2'},
+ {id:'gold',name:'Gold & Black',ink:'#c9a04a',paper:'#131110'},
+ {id:'shu',name:'Vermilion & Cream',ink:'#c8402e',paper:'#f6edd9'},
+ {id:'ai',name:'Indigo & White',ink:'#243a63',paper:'#fbfaf6'},
+ {id:'kon',name:'White on Indigo',ink:'#f4f1e8',paper:'#1f2d4d'},
+ {id:'matcha',name:'Moss & Rice',ink:'#4e5d2c',paper:'#efebd9'}
+];
+
+function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false}={}){
+ const fr=FRAMES.find(x=>x.id===s.frame)||FRAMES[0],mo=MOTIFS.find(x=>x.id===s.motif)||MOTIFS[0];
+ const sc=f((motifOnly?1.15:fr.fit)*s.size/100);
+ const bg=transparent?'':`<rect width="200" height="200" fill="${s.paper}"/>`;
+ const frame=motifOnly||!fr.d?'':`<path d="${fr.d}" fill-rule="evenodd"/>`;
+ const motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg()}</g>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${bg}<g transform="translate(100 100)" fill="${s.ink}" color="${s.ink}">${frame}${motif}</g></svg>`
+  .replace(/var\(--p\)/g,s.paper);
+}
+
+const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false};
+const load=()=>{try{const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const andList=k=>k.length>2?k.slice(0,-1).join(', ')+', and '+k.at(-1):k.join(' and ');
+const TABS=[['frame','Frame'],['motif','Motif'],['adjust','Adjust'],['color','Colour'],['meaning','Meaning']];
+
+function App(){
+ const [s,setS]=useState(load);
+ const [tab,setTab]=useState('motif');
+ const [pop,setPop]=useState(0);
+ const [toast,setToast]=useState('');
+ const [modal,setModal]=useState(null);
+ const dl=useRef(null);const touch=useRef(null);
+ useEffect(()=>{try{localStorage.setItem('kamon',JSON.stringify(s))}catch(e){}},[s]);
+ useEffect(()=>{let live=true;window.claude?.use?.('downloads').then(d=>{if(live)dl.current=d}).catch(()=>{});return()=>{live=false}},[]);
+ useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),2400);return()=>clearTimeout(t)},[toast]);
+ const set=p=>setS(o=>({...o,...p}));
+ const step=useCallback((key,list,d)=>setS(o=>{const i=list.findIndex(x=>x.id===o[key]);return {...o,[key]:list[(i+d+list.length)%list.length].id}}),[]);
+ useEffect(()=>{const k=e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return;
+   if(e.key==='ArrowRight')step('motif',MOTIFS,1);else if(e.key==='ArrowLeft')step('motif',MOTIFS,-1);
+   else if(e.key==='ArrowDown')step('frame',FRAMES,1);else if(e.key==='ArrowUp')step('frame',FRAMES,-1);
+   else if(e.key==='r'||e.key==='R')randomize();else return;e.preventDefault()};
+  addEventListener('keydown',k);return()=>removeEventListener('keydown',k)},[step]);
+
+ const fr=FRAMES.find(x=>x.id===s.frame),mo=MOTIFS.find(x=>x.id===s.motif);
+ const preview=useMemo(()=>buildSVG(s,{size:600}),[s]);
+ const kws=[...mo.kw,...(fr.kw||[])];
+ const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}`;
+
+ function randomize(){const p=pick(PRESETS);setS(o=>({...o,frame:pick(FRAMES).id,motif:pick(MOTIFS).id,size:85+Math.round(Math.random()*5)*5,rot:pick([0,0,0,0,15,30,45,90,180]),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
+ async function save(filename,data,fallback){const d=dl.current;
+  if(d){try{await d.save({filename,data});setToast('Saved '+filename);return}catch(e){if(e?.code==='declined'){setToast('Download cancelled');return}if(e?.code==='rate_limited'){setToast('One moment — try again');return}}}
+  if(!window.claude){/* standalone (e.g. GitHub Pages): plain browser download */
+   const blob=data instanceof Blob?data:new Blob([data],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);setToast('Saved '+filename);return}
+  fallback()}
+ const svgText=()=>buildSVG(s,{size:1024,transparent:s.transparent});
+ const toPNG=()=>new Promise((res,rej)=>{const img=new Image();const url=URL.createObjectURL(new Blob([svgText()],{type:'image/svg+xml'}));
+  img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=1024;c.getContext('2d').drawImage(img,0,0,1024,1024);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(),'image/png')};img.onerror=rej;img.src=url});
+ const savePNG=async()=>{try{const b=await toPNG();save(fname+'.png',b,()=>setModal({type:'png',src:URL.createObjectURL(b)}))}catch(e){setToast('Could not render PNG')}};
+ const saveSVG=()=>save(fname+'.svg',svgText(),()=>setModal({type:'svg',text:svgText()}));
+ const copySVG=async t=>{try{await navigator.clipboard.writeText(t);setToast('SVG copied')}catch(e){setToast('Copy blocked — select the code instead')}};
+ const onTS=e=>{touch.current=[e.touches[0].clientX,e.touches[0].clientY]};
+ const onTE=e=>{if(!touch.current)return;const dx=e.changedTouches[0].clientX-touch.current[0],dy=e.changedTouches[0].clientY-touch.current[1];touch.current=null;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)step('motif',MOTIFS,dx<0?1:-1)};
+
+ const thumbS={...s,size:100,rot:0};
+ const opt=(key,x,svg,label)=>html`<button key=${x.id} class="opt" aria-pressed=${s[key]===x.id} title=${label} aria-label=${label} onClick=${()=>set({[key]:x.id})}>
+   <span class="th" dangerouslySetInnerHTML=${{__html:svg}}></span><span class="lb">${x.name}</span></button>`;
+ const hid=id=>tab!==id;
+
+ return html`<div class="app">
+  <header class="top">
+   <div class="seal" aria-hidden="true">紋</div><h1>Kamon Maker</h1>
+   <div class="acts"><button class="btn ink" onClick=${savePNG}>PNG<span class="hide-s"> 1024</span></button><button class="btn" onClick=${saveSVG}>SVG</button></div>
+  </header>
+  <main class="body">
+   <section class="stage" aria-label="Your crest">
+    <div class=${'crestbox'+(pop?' pop':'')} key=${pop} onTouchStart=${onTS} onTouchEnd=${onTE}>
+     <div class="art" role="img" aria-label=${`${fr.ro} ${mo.name}`} dangerouslySetInnerHTML=${{__html:preview}}></div>
+     <button class="nav l" aria-label="Previous motif" onClick=${()=>step('motif',MOTIFS,-1)}>‹</button>
+     <button class="nav r" aria-label="Next motif" onClick=${()=>step('motif',MOTIFS,1)}>›</button>
+    </div>
+    <div class="namebar">
+     <div class="name"><div class="jp">${fr.jp}${mo.jp}</div>
+      <div class="ro">${fr.ro} ${mo.name} · ${fr.id!=='none'?fr.en+' with ':''}${mo.en}</div>
+      <div class="sym">Symbolizes <b>${andList(kws)}</b></div></div>
+     <button class="btn primary" onClick=${randomize}>⟳ Randomize</button>
+    </div>
+   </section>
+
+   <nav class="tabs" role="tablist">${TABS.map(([id,l])=>html`<button key=${id} role="tab" aria-selected=${tab===id} onClick=${()=>setTab(id)}>${l}</button>`)}</nav>
+
+   <section class="panel p-frame" hidden=${hid('frame')}><h3>Outer frame <em>${fr.name}${fr.en?' · '+fr.en:''}</em></h3>
+    <div class="grid">${FRAMES.map(x=>opt('frame',x,buildSVG({...thumbS,frame:x.id},{size:46,frameOnly:x.id!=='none'}),x.name+(x.en?' — '+x.en:'')))}</div></section>
+
+   <section class="panel p-motif" hidden=${hid('motif')}><h3>Center motif <em>${mo.name} · ${mo.en}</em></h3>
+    <div class="grid m">${MOTIFS.map(x=>opt('motif',x,buildSVG({...thumbS,motif:x.id},{size:46,motifOnly:true}),x.name+' — '+x.en))}</div></section>
+
+   <section class="panel p-adjust" hidden=${hid('adjust')}><h3>Size & rotation</h3>
+    <div class="row"><label for="sz">Size</label><input id="sz" type="range" min="50" max="140" step="1" value=${s.size} onInput=${e=>set({size:+e.target.value})}/><output>${s.size}%</output></div>
+    <div class="row"><label for="rt">Rotation</label><input id="rt" type="range" min="0" max="360" step="1" value=${s.rot} onInput=${e=>set({rot:+e.target.value})}/><output>${s.rot}°</output></div>
+    <div class="quick">${[0,45,90,180].map(a=>html`<button key=${a} class="chip" onClick=${()=>set({rot:a})}>${a}°</button>`)}<button class="chip" onClick=${()=>set({size:100,rot:0})}>Reset</button></div>
+   </section>
+
+   <section class="panel p-color" hidden=${hid('color')}><h3>Traditional colours</h3>
+    <div class="presets">${PRESETS.map(p=>html`<button key=${p.id} class="preset" aria-pressed=${s.preset===p.id} onClick=${()=>set({ink:p.ink,paper:p.paper,preset:p.id})}>
+     <i style=${{background:p.paper}}><b style=${{background:p.ink}}></b></i><span>${p.name}</span></button>`)}</div>
+    <div class="colors">
+     <label class="color"><input type="color" value=${s.ink} onInput=${e=>set({ink:e.target.value,preset:''})}/><span>Crest</span><code>${s.ink}</code></label>
+     <label class="color"><input type="color" value=${s.paper} onInput=${e=>set({paper:e.target.value,preset:''})}/><span>Ground</span><code>${s.paper}</code></label>
+    </div>
+    <label class="check"><input type="checkbox" checked=${s.transparent} onChange=${e=>set({transparent:e.target.checked})}/>Transparent ground in downloads</label>
+   </section>
+
+   <section class="panel p-meaning" hidden=${hid('meaning')} aria-live="polite"><h3>Meaning & origin</h3>
+    <div class="kw">${kws.map(k=>html`<span key=${k}>${k}</span>`)}</div>
+    <p class="lead">${fr.id==='none'?`Unframed, the ${mo.en.toLowerCase()} speaks directly.`:`The ${fr.en.toLowerCase()} gathers the ${mo.en.toLowerCase()} into one emblem: ${mo.kw[0]} held within ${fr.kw[0]}.`}</p>
+    <p><b>${mo.name} · ${mo.jp}.</b> ${mo.text}</p>
+    ${fr.id!=='none'&&html`<p><b>${fr.name} · ${fr.jp.replace('に','')}.</b> ${fr.text}</p>`}
+    <small>Symbolic readings are traditional associations, not fixed rules. Your crest is an original design, not a registered family mon.</small>
+   </section>
+  </main>
+
+  ${modal&&html`<div class="modal" onClick=${e=>{if(e.target===e.currentTarget)setModal(null)}}><div class="box">
+   <h3>${modal.type==='png'?'Save your PNG':'Your SVG'}</h3>
+   ${modal.type==='png'?html`<img src=${modal.src} alt="Your crest, 1024 by 1024 PNG"/><p>Downloads aren’t available in this view. Long-press (phone) or right-click (desktop) the image to save it.</p>`
+    :html`<textarea readonly style=${{width:'100%',height:'160px',font:'12px monospace',borderRadius:'8px',padding:'8px'}} value=${modal.text}></textarea><button class="btn ink" onClick=${()=>copySVG(modal.text)}>Copy SVG code</button>`}
+   <button class="btn" onClick=${()=>setModal(null)}>Close</button></div></div>`}
+  ${toast&&html`<div class="toast" role="status">${toast}</div>`}
+ </div>`;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
+}
+</script>
+</body>
+</html>
