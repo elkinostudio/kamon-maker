@@ -1,6 +1,6 @@
 # Kamon Maker — Japanese Family Crest Generator
 
-*by mono Japan*
+*by [mono Japan](https://www.youtube.com/@mono_Japan)* — documentaries on Japanese culture, aesthetics and philosophy
 
 Design your own Japanese family crest (*kamon*) in the browser. Pick an outer frame and a center motif, adjust size, rotation and traditional colours, read what your combination symbolizes, and download it as a 1024×1024 PNG or a scalable SVG.
 
@@ -11,12 +11,12 @@ Design your own Japanese family crest (*kamon*) in the browser. Pick an outer fr
 ## Features
 
 - **6 outer frames** — None, Maru (Circle), Futae-maru (Double Circle), Sumikiri-kaku (Cut-corner Square), Kikkō (Tortoise Shell), Sumitate-kaku (Diamond Square)
-- **29 center motifs in 5 categories**
-  - Plants: Umebachi, Kikyō, Hanabishi, Sakura, Go-san no Kiri, Mitsuba-aoi, Mitsu-ichō
-  - Animals: Chidori, Chō, Usagi, Tonbo, Chigai Taka-no-ha, Kame
-  - Sky & Nature: Kuyō, Ichimonji Mitsuboshi, Yukiwa, Mikazuki, Fuji
-  - Objects: Chigai-ya, Igeta, Genji-guruma, Ōgi, Fundō
-  - Patterns: Mitsu-uroko, Takeda-bishi, Mitsu-domoe, Wa-chigai, Yotsume-yui, Shippō
+- **41 center motifs in 5 categories**
+  - Plants: Umebachi, Kikyō, Hanabishi, Sakura, Go-san no Kiri, Mitsuba-aoi, Mitsu-ichō, Kiku, Mitsu-sasa, Mitsu-gashiwa
+  - Animals: Chidori, Chō, Usagi, Tonbo, Chigai Taka-no-ha, Kame, Karigane, Tsuru, Kani
+  - Sky & Nature: Kuyō, Ichimonji Mitsuboshi, Yukiwa, Mikazuki, Fuji, Kumo
+  - Objects: Chigai-ya, Igeta, Genji-guruma, Ōgi, Fundō, Rokumonsen, Kuginuki
+  - Patterns: Mitsu-uroko, Takeda-bishi, Mitsu-domoe, Wa-chigai, Yotsume-yui, Shippō, Asanoha, Matsukawa-bishi, Seigaiha
 - **Size and rotation** controls
 - **Traditional colour presets** plus free colour pickers, with an optional transparent background
 - **Meaning & origin card** that describes your combination in English
