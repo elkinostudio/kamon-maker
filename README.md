@@ -1,15 +1,22 @@
 # Kamon Maker — Japanese Family Crest Generator
 
+*by mono Japan*
+
 Design your own Japanese family crest (*kamon*) in the browser. Pick an outer frame and a center motif, adjust size, rotation and traditional colours, read what your combination symbolizes, and download it as a 1024×1024 PNG or a scalable SVG.
 
-**Live demo:** https://YOUR-USERNAME.github.io/kamon-maker/
+**Live demo:** https://elkinostudio.github.io/kamon-maker/
 
 ![Kamon Maker on desktop](screenshot-desktop.png)
 
 ## Features
 
 - **6 outer frames** — None, Maru (Circle), Futae-maru (Double Circle), Sumikiri-kaku (Cut-corner Square), Kikkō (Tortoise Shell), Sumitate-kaku (Diamond Square)
-- **15 center motifs** — Mitsu-uroko, Takeda-bishi, Umebachi, Mitsu-domoe, Kikyō, Chigai-ya, Kuyō, Hanabishi, Sakura, Go-san no Kiri, Wa-chigai, Yotsume-yui, Igeta, Genji-guruma, Ichimonji Mitsuboshi
+- **29 center motifs in 5 categories**
+  - Plants: Umebachi, Kikyō, Hanabishi, Sakura, Go-san no Kiri, Mitsuba-aoi, Mitsu-ichō
+  - Animals: Chidori, Chō, Usagi, Tonbo, Chigai Taka-no-ha, Kame
+  - Sky & Nature: Kuyō, Ichimonji Mitsuboshi, Yukiwa, Mikazuki, Fuji
+  - Objects: Chigai-ya, Igeta, Genji-guruma, Ōgi, Fundō
+  - Patterns: Mitsu-uroko, Takeda-bishi, Mitsu-domoe, Wa-chigai, Yotsume-yui, Shippō
 - **Size and rotation** controls
 - **Traditional colour presets** plus free colour pickers, with an optional transparent background
 - **Meaning & origin card** that describes your combination in English
