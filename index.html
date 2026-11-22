@@ -34,10 +34,10 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .by{font-size:12px;color:var(--mute);line-height:1;white-space:nowrap;text-decoration:none}
 .by:hover{color:var(--shu);text-decoration:underline}
 a.btn{text-decoration:none;color:inherit}
-.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:0 0 8px}
+.cats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;margin:0 0 8px}
 .cats button{min-height:38px;border:1px solid var(--line);border-radius:8px;background:transparent;display:grid;place-items:center;line-height:1.1;padding:3px 2px}
-.cats button span{font-size:12px;font-weight:500}
-.cats small{font-size:10.5px;color:var(--mute)}
+.cats button span{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cats small{font-size:10px;color:var(--mute);white-space:nowrap}
 .cats button[aria-selected=true]{background:var(--sel);border-color:var(--sel);color:var(--selink)}
 .cats button[aria-selected=true] small{color:inherit;opacity:.75}
 .top .acts{margin-left:auto;display:flex;gap:6px}
@@ -95,7 +95,8 @@ a.btn{text-decoration:none;color:inherit}
 .opt:hover{border-color:var(--mute)}
 .opt[aria-pressed=true]{border-color:var(--shu);background:color-mix(in srgb,var(--shu) 9%,transparent);box-shadow:inset 0 0 0 1px var(--shu)}
 @media(min-width:960px) and (min-height:600px){
- .grid{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.m{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.m{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .grid.m .opt .lb{font-size:10.5px}
  .opt .lb{display:block}.opt .th{max-width:44px}
 }
 @media(min-width:600px) and (max-width:959px){.opt .lb{display:block}}
@@ -160,16 +161,16 @@ const P='var(--p)';
 
 /* ---------- frames ---------- */
 const FRAMES=[
- {id:'none',name:'None',en:'',ro:'',jp:'',fit:1.28,d:''},
- {id:'maru',name:'Maru',en:'Circle',ro:'Maru ni',jp:'丸に',fit:1,d:circ(95)+circ(83),
+ {id:'none',name:'None',en:'',ro:'',jp:'',fit:1.28,d:'',inner:circ(90)},
+ {id:'maru',name:'Maru',en:'Circle',ro:'Maru ni',jp:'丸に',fit:1,d:circ(95)+circ(83),inner:circ(83),
   kw:['harmony','completeness'],text:'The circle is the simplest and most familiar enclosure in Japanese heraldry — a single line that gathers the motif into a whole.'},
- {id:'futae',name:'Futae-maru',en:'Double Circle',ro:'Futae-maru ni',jp:'二重丸に',fit:.94,d:circ(95)+circ(87)+circ(83)+circ(79.5),
+ {id:'futae',name:'Futae-maru',en:'Double Circle',ro:'Futae-maru ni',jp:'二重丸に',fit:.94,d:circ(95)+circ(87)+circ(83)+circ(79.5),inner:circ(79.5),
   kw:['continuity','unity'],text:'A doubled ring: a heavy outer line with a fine one inside, reading as a layered, enduring boundary.'},
- {id:'sumikiri',name:'Sumikiri-kaku',en:'Cut-corner Square',ro:'Sumikiri-kaku ni',jp:'隅切り角に',fit:1.02,d:poly(octa(90,28))+poly(octa(79,24)),
+ {id:'sumikiri',name:'Sumikiri-kaku',en:'Cut-corner Square',ro:'Sumikiri-kaku ni',jp:'隅切り角に',fit:1.02,d:poly(octa(90,28))+poly(octa(79,24)),inner:poly(octa(79,24)),
   kw:['order','refinement'],text:'A square with its corners trimmed away — firm and orderly, but with the hard edges softened.'},
- {id:'kikko',name:'Kikkō',en:'Tortoise Shell',ro:'Kikkō ni',jp:'亀甲に',fit:.9,d:poly(ngon(6,97))+poly(ngon(6,88))+poly(ngon(6,84))+poly(ngon(6,80.5)),
+ {id:'kikko',name:'Kikkō',en:'Tortoise Shell',ro:'Kikkō ni',jp:'亀甲に',fit:.9,d:poly(ngon(6,97))+poly(ngon(6,88))+poly(ngon(6,84))+poly(ngon(6,80.5)),inner:poly(ngon(6,80.5)),
   kw:['longevity','good fortune'],text:'The hexagon imitates the plates of a tortoise shell, an animal tied to long life. Izumo Taisha encloses its crest in a double tortoise shell; one explanation links the hexagon to Genbu, the turtle-and-snake guardian of the north.'},
- {id:'sumitate',name:'Sumitate-kaku',en:'Diamond Square',ro:'Sumitate-kaku ni',jp:'隅立て角に',fit:.8,d:poly(ngon(4,97,-Math.PI/2))+poly(ngon(4,84,-Math.PI/2)),
+ {id:'sumitate',name:'Sumitate-kaku',en:'Diamond Square',ro:'Sumitate-kaku ni',jp:'隅立て角に',fit:.8,d:poly(ngon(4,97,-Math.PI/2))+poly(ngon(4,84,-Math.PI/2)),inner:poly(ngon(4,84,-Math.PI/2)),
   kw:['balance','resolve'],text:'A square stood on its corner — the same shape as a plain square, made alert and upright.'}
 ];
 
@@ -197,13 +198,13 @@ const MOTIFS=[
   svg:()=>{const a=78,b=54,c=[0,0],Q=[[0,-b],[a/2,-b/2],[a,0],[a/2,b/2],[0,b],[-a/2,b/2],[-a,0],[-a/2,-b/2]];
    return `<path d="${[[Q[0],Q[1],c,Q[7]],[Q[1],Q[2],Q[3],c],[c,Q[3],Q[4],Q[5]],[Q[7],c,Q[5],Q[6]]].map(t=>poly(shrink(t,.9))).join('')}"/>`},
   text:'A large diamond split into four — the crest of the Takeda clan of Kai province, the house of the warlord Takeda Shingen. The word hishi (diamond) is also the name of the water chestnut.'},
- {id:'ume',cat:'plants',name:'Umebachi',en:'Plum Blossom',jp:'梅鉢',kw:['perseverance','learning'],
+ {id:'ume',cat:'flowers',name:'Umebachi',en:'Plum Blossom',jp:'梅鉢',kw:['perseverance','learning'],
   svg:()=>ngon(5,41,-Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="22.5"/>`).join('')+`<circle r="11.5"/>`+ngon(5,17.5,Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="2.6"/>`).join(''),
   text:'A stylised plum blossom of five round petals. The plum flowers in late winter, so it stands for endurance. Plum crests belong to the cult of the scholar Sugawara no Michizane: Kitano Tenmangū in Kyoto, head shrine of Tenjin worship, uses a “star plum” variant.'},
  {id:'tomoe',cat:'patterns',name:'Mitsu-domoe',en:'Comma Swirl',jp:'三つ巴',kw:['cycles of life','guarding'],
   svg:()=>{const p=tomoe();return [0,120,240].map(a=>rot(a,`<path d="${p}"/>`)).join('')},
   text:'Three comma shapes turning around a centre — one of the most common shrine crests, long associated with shrines to Hachiman, the deity the Minamoto warrior clan took as its guardian.'},
- {id:'kikyo',cat:'plants',name:'Kikyō',en:'Bellflower',jp:'桔梗',kw:['sincerity','constancy'],
+ {id:'kikyo',cat:'flowers',name:'Kikyō',en:'Bellflower',jp:'桔梗',kw:['sincerity','constancy'],
   svg:()=>{const pet=`<path d="M0-5L-27.5-43Q-29-64 0-76Q29-64 27.5-43Z"/><path d="M0-16V-48" stroke="${P}" stroke-width="2.4" stroke-linecap="round"/>`;
    return [0,72,144,216,288].map(a=>rot(a,pet)).join('')+`<circle r="6" fill="${P}"/>`},
   text:'The five pointed petals of the Chinese bellflower, a classic flower of autumn. It is associated with the Toki clan of Mino province and with Akechi Mitsuhide, who came from a branch of the Toki.'},
@@ -213,15 +214,15 @@ const MOTIFS=[
  {id:'kuyo',cat:'sky',name:'Kuyō',en:'Nine Stars',jp:'九曜',kw:['guidance','heavenly order'],
   svg:()=>`<circle r="21"/>`+ngon(8,52,-Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="15.5"/>`).join(''),
   text:'Nine circles for nine heavenly bodies — sun, moon, five planets and two “shadow” stars tied to eclipses — once painted on carriages and robes for protection. Hosokawa Tadaoki is said to have received it from Oda Nobunaga, and it became the Hosokawa crest.'},
- {id:'hanabishi',cat:'plants',name:'Hanabishi',en:'Flower Diamond',jp:'花菱',kw:['elegance','grace'],
+ {id:'hanabishi',cat:'flowers',name:'Hanabishi',en:'Flower Diamond',jp:'花菱',kw:['elegance','grace'],
   svg:()=>{const p=`<path d="M0-7C-16-12-26-34-14-50C-8-56-2-54 0-46C2-54 8-56 14-50C26-34 16-12 0-7Z" ${sep}/>`;
    return `<g transform="scale(1.32 1.04)">${[0,90,180,270].map(a=>rot(a,p)).join('')}</g>`+ngon(4,7,Math.PI/4).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="2" />`).join('')},
   text:'Four heart-shaped petals set in a diamond — an old court pattern. At Izumo Taisha a four-petalled flower divided by sword blades sits inside the double tortoise shell of the shrine’s crest.'},
- {id:'sakura',cat:'plants',name:'Sakura',en:'Cherry Blossom',jp:'桜',kw:['renewal','transience'],
+ {id:'sakura',cat:'flowers',name:'Sakura',en:'Cherry Blossom',jp:'桜',kw:['renewal','transience'],
   svg:()=>{const p=`<path d="M0-8C-23-16-32-46-17-66L0-55L17-66C32-46 23-16 0-8Z" ${sep}/><path d="M0-12V-22" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`;
    return [0,72,144,216,288].map(a=>rot(a,p)).join('')+`<circle r="6" fill="${P}"/><circle r="2.6"/>`},
   text:'Five notched cherry petals. The blossoms open briefly and fall together, and Japanese poetry has long read them as an image of beauty that does not last.'},
- {id:'kiri',cat:'plants',name:'Go-san no Kiri',en:'Paulownia',jp:'五三桐',kw:['honour','authority'],
+ {id:'kiri',cat:'leaves',name:'Go-san no Kiri',en:'Paulownia',jp:'五三桐',kw:['honour','authority'],
   svg:()=>`<g transform="translate(0 5) scale(.93)">`+
    `<g transform="translate(0 10) rotate(70) scale(.92)">${leaf}</g><g transform="translate(0 10) rotate(-70) scale(.92)">${leaf}</g><g transform="translate(0 8)">${leaf}</g>`+
    `<g transform="translate(0 -2)">${stalk(5)}</g><g transform="translate(-24 -2) rotate(-30)">${stalk(3)}</g><g transform="translate(24 -2) rotate(30)">${stalk(3)}</g></g>`,
@@ -294,13 +295,13 @@ const MOTIFS=[
    `<rect x="-58" y="52" width="116" height="8" rx="4"/><rect x="-36" y="66" width="72" height="8" rx="4"/></g>`,
   text:'Japan’s highest mountain, with its snow-capped triple summit above bands of mist. Fuji has been revered for centuries as a sacred peak.'},
  /* ---- added: plants ---- */
- {id:'aoi',cat:'plants',name:'Mitsuba-aoi',en:'Three Hollyhock Leaves',jp:'三つ葉葵',kw:['authority','protection'],
+ {id:'aoi',cat:'leaves',name:'Mitsuba-aoi',en:'Three Hollyhock Leaves',jp:'三つ葉葵',kw:['authority','protection'],
   svg:()=>{const lf=`<path d="M0-14C-6-8-30-12-32-32C-34-52-14-66 0-74C14-66 34-52 32-32C30-12 6-8 0-14Z"/>`+
    `<path d="M0-18V-66M0-30L-16-24M0-30L16-24M0-42L-20-40M0-42L20-40M0-54L-16-56M0-54L16-56" fill="none" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`+
    `<path d="M0 0V-16" stroke="currentColor" stroke-width="4.5"/>`;
    return [0,120,240].map(a=>rot(a,lf)).join('')+`<circle r="6"/>`},
   text:'Three heart-shaped leaves meeting at the centre — the crest of the Tokugawa shoguns, still seen in gold at Nikkō Tōshōgū, the shrine dedicated to Tokugawa Ieyasu.'},
- {id:'icho',cat:'plants',name:'Mitsu-ichō',en:'Three Ginkgo Leaves',jp:'三つ銀杏',kw:['endurance','long life'],
+ {id:'icho',cat:'leaves',name:'Mitsu-ichō',en:'Three Ginkgo Leaves',jp:'三つ銀杏',kw:['endurance','long life'],
   svg:()=>{const lf=`<path d="M0-12L-38-54A56 56 0 0 1-4-68L0-55L4-68A56 56 0 0 1 38-54Z" ${sep}/>`+
    `<path d="M0 0V-14" stroke="currentColor" stroke-width="4"/>`;
    return [0,120,240].map(a=>rot(a,lf)).join('')+`<circle r="5"/>`},
@@ -325,15 +326,15 @@ const MOTIFS=[
   text:'Circles overlapping by a quarter, named after the seven treasures of Buddhism. The endlessly linked rings are read as harmony and good relationships.'},
 
  /* ---- round 3 ---- */
- {id:'kiku',cat:'plants',name:'Kiku',en:'Chrysanthemum',jp:'十二菊',kw:['nobility','long life'],
+ {id:'kiku',cat:'flowers',name:'Kiku',en:'Chrysanthemum',jp:'十二菊',kw:['nobility','long life'],
   svg:()=>{const p=`<path d="M-5.5-17L-13.5-62Q0-76 13.5-62L5.5-17Z" ${sep}/>`;
    return Array.from({length:12},(_,i)=>rot(i*30,p)).join('')+`<circle r="17" ${sep}/>`},
   text:'A chrysanthemum seen from the front. The imperial family uses a sixteen-petalled double chrysanthemum; this design has twelve petals, like the many chrysanthemum crests used by ordinary families and shrines.'},
- {id:'sasa',cat:'plants',name:'Mitsu-sasa',en:'Three Bamboo Leaves',jp:'三つ笹',kw:['resilience','integrity'],
+ {id:'sasa',cat:'leaves',name:'Mitsu-sasa',en:'Three Bamboo Leaves',jp:'三つ笹',kw:['resilience','integrity'],
   svg:()=>{const lf=`<path d="M0-6C20-18 22-52 0-76C-22-52-20-18 0-6Z" ${sep}/><path d="M0-14V-66" stroke="${P}" stroke-width="2.4"/>`;
    return [0,120,240].map(a=>rot(a,lf)).join('')+[60,180,300].map(a=>rot(a,`<g transform="scale(.66)">${lf}</g>`)).join('')+`<circle r="5"/>`},
   text:'Bamboo leaves fanned around a centre. Bamboo bends in the wind without breaking and stays green through winter, so it stands for resilience and an upright character.'},
- {id:'kashiwa',cat:'plants',name:'Mitsu-gashiwa',en:'Three Oak Leaves',jp:'三つ柏',kw:['family continuity','prosperity'],
+ {id:'kashiwa',cat:'leaves',name:'Mitsu-gashiwa',en:'Three Oak Leaves',jp:'三つ柏',kw:['family continuity','prosperity'],
   svg:()=>{const N=40,L=72,pts=[];for(let i=0;i<=N;i++){const t=i/N,w=22*Math.pow(Math.sin(Math.PI*t),.8)+4*Math.abs(Math.sin(5*Math.PI*t))*Math.sin(Math.PI*t);pts.push([w,-8-L*t])}
    const d='M'+[...pts,...pts.slice().reverse().map(([x,y])=>[-x,y])].map(p=>p.map(f).join(' ')).join('L')+'Z';
    const lf=`<path d="${d}" ${sep}/><path d="M0-12V-74M0-26L-12-34M0-26L12-34M0-40L-14-48M0-40L14-48M0-54L-11-62M0-54L11-62" fill="none" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`;
@@ -366,7 +367,7 @@ const MOTIFS=[
   text:'Six copper coins in two rows — the famous crest of the Sanada clan of Shinano, still seen everywhere around Ueda Castle. Six coins were customarily placed with the dead as the fare across the Sanzu River to the afterlife, and the crest is popularly read as a warrior’s readiness to die.'},
  {id:'kuginuki',cat:'objects',name:'Kuginuki',en:'Nail Puller',jp:'釘抜',kw:['strength','removing obstacles'],
   svg:()=>`<g transform="rotate(45)"><path fill-rule="evenodd" d="M-48-48H48V48H-48ZM-19-19H19V19H-19Z"/><path d="M-48 0H-19M19 0H48" stroke="${P}" stroke-width="2.6"/></g>`,
-  text:'The square washer of a large nail puller used in temple carpentry. Because it pulls out nails, the crest is read as clearing away obstacles.'},
+  text:'The square washer once slipped under a nail so it could be prised out again. Kugi o nuku, “pull out a nail”, sounds like ku o nuku, “pull out suffering”, which made it a lucky crest for samurai.'},
  {id:'asanoha',cat:'patterns',name:'Asanoha',en:'Hemp Leaf',jp:'麻の葉',kw:['healthy growth','protection'],
   svg:()=>{const k=`<path d="M0-4L-17-32L0-72L17-32Z" ${sep}/><path d="M0-10V-64" stroke="${P}" stroke-width="2"/>`;return Array.from({length:6},(_,i)=>rot(i*60,k)).join('')},
   text:'Six diamonds radiating from a centre, like a hemp leaf. Hemp grows quickly and straight, so the pattern was often used on children’s clothing as a wish for healthy growth.'},
@@ -377,6 +378,92 @@ const MOTIFS=[
   svg:()=>{const fan=(cx,cy)=>`<path d="M${cx-38} ${cy}A38 38 0 0 1 ${cx+38} ${cy}Z" fill="${P}"/>`+[38,29,20,11].map(r=>`<path d="M${cx-r+2.5} ${cy}A${r-2.5} ${r-2.5} 0 0 1 ${cx+r-2.5} ${cy}" fill="none" stroke="currentColor" stroke-width="5"/>`).join('');
    return `<g transform="translate(0 -6)">`+fan(-34,16)+fan(34,16)+fan(0,46)+`<path d="M-72 46H72" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></g>`},
   text:'Layers of fan-shaped waves. The calm, endlessly repeating sea carries a wish for peaceful days that go on and on.'},
+
+ /* ---- round 4: redrawn from reference set (batch 1) ---- */
+ {id:'hiki1',cat:'patterns',clip:1,name:'Hitotsu-hiki',en:'One Bar',jp:'一つ引',kw:['unity','clarity'],
+  svg:()=>`<rect x="-120" y="-16" width="240" height="32"/>`,
+  text:'A single bold band — the plainest of the “drawn-line” (hikiryō) crests, usually set inside a circle.'},
+ {id:'hiki2',cat:'patterns',clip:1,name:'Futatsu-hiki',en:'Two Bars',jp:'二つ引',kw:['order','authority'],
+  svg:()=>`<rect x="-120" y="-38" width="240" height="27"/><rect x="-120" y="11" width="240" height="27"/>`,
+  text:'Two horizontal bands. Set inside a circle, this is the crest of the Ashikaga, the family that founded the Muromachi shogunate.'},
+ {id:'hiki3',cat:'patterns',clip:1,name:'Mitsu-hiki',en:'Three Bars',jp:'三つ引',kw:['balance','steadiness'],
+  svg:()=>`<rect x="-120" y="-46" width="240" height="20"/><rect x="-120" y="-10" width="240" height="20"/><rect x="-120" y="26" width="240" height="20"/>`,
+  text:'Three evenly spaced bands — a variation of the drawn-line crests, simple enough to read from far across a battlefield.'},
+ {id:'jumonji',cat:'patterns',clip:1,name:'Jūmonji',en:'Cross',jp:'十文字',kw:['protection','steadfastness'],
+  svg:()=>`<path d="M-10-120H10V-10H120V10H10V120H-10V10H-120V-10H-10Z"/>`,
+  text:'A plain cross that reaches the edge of its frame. Inside a circle it is the crest of the Shimazu, lords of Satsuma in southern Kyūshū.'},
+ {id:'janome',cat:'patterns',name:'Ja-no-me',en:'Snake’s Eye',jp:'蛇の目',kw:['protection','vigilance'],
+  svg:()=>`<path fill-rule="evenodd" d="${circ(66)+circ(36)}"/>`,
+  text:'A thick ring named after the round eye of a snake — a bold, simple emblem of watchfulness.'},
+ {id:'kokumochi',cat:'patterns',name:'Koku-mochi',en:'Black Disc',jp:'黒餅',kw:['abundance','wholeness'],
+  svg:()=>`<circle r="68"/>`,
+  text:'A solid disc, called koku-mochi, “black rice cake”. Plain discs like this also served as a ground from which other crests were cut out in white.'},
+ {id:'kyokko',cat:'sky',name:'Kyokkō',en:'Rising Sun Rays',jp:'旭光',kw:['vitality','hope'],
+  svg:()=>`<circle r="24"/>`+Array.from({length:16},(_,i)=>rot(i*22.5,`<path d="M-5.5-30L0-${i%2?58:72}L5.5-30Z"/>`)).join(''),
+  text:'A sun sending out rays of two lengths — the morning sun, an image of fresh energy and hope.'},
+ {id:'mitsuboshi3',cat:'sky',name:'Mitsu-boshi',en:'Three Stars',jp:'三つ星',kw:['guidance','harmony'],
+  svg:()=>[[0,-30],[-34,26],[34,26]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="27"/>`).join(''),
+  text:'Three stars in a triangle — the plainest of the star crests, drawn as simple discs.'},
+ {id:'mutsuboshi',cat:'sky',name:'Mutsu-boshi',en:'Six Stars',jp:'六つ星',kw:['fortune','connection'],
+  svg:()=>`<circle r="20"/>`+ngon(5,50,-Math.PI/2).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="19"/>`).join(''),
+  text:'One star circled by five more — a compact constellation, read as many fortunes gathered around one centre.'},
+ {id:'chigaibishi',cat:'patterns',name:'Chigai-bishi',en:'Linked Diamonds',jp:'違い菱',kw:['partnership','bonds'],
+  svg:()=>{const ring=(cx,extra='')=>`<path fill-rule="evenodd" d="M${cx-50} 0L${cx} -50L${cx+50} 0L${cx} 50ZM${cx-32} 0L${cx} -32L${cx+32} 0L${cx} 32Z" ${extra}/>`;
+   return ring(-22)+ring(22,sep)},
+  text:'Two diamond rings laid across each other, an angular cousin of the linked-rings crest.'},
+ {id:'yotsuishi',cat:'patterns',name:'Yotsu-ishi',en:'Four Stones',jp:'四つ石',kw:['order','prosperity'],
+  svg:()=>[[0,-40],[-40,0],[40,0],[0,40]].map(([x,y])=>`<rect x="${x-20}" y="${y-20}" width="40" height="40"/>`).join(''),
+  text:'Four square paving stones set corner to corner. Squares like these form the ishidatami (stone pavement) pattern, which later became known as the ichimatsu checkerboard.'},
+ {id:'hitouroko',cat:'patterns',name:'Hitotsu-uroko',en:'One Scale',jp:'一つ鱗',kw:['protection','focus'],
+  svg:()=>`<path d="${poly(ngon(3,72,-Math.PI/2).map(([x,y])=>[x,y+12]))}"/>`,
+  text:'A single triangular scale — the simplest of the scale crests.'},
+ {id:'suhama',cat:'patterns',name:'Suhama',en:'Sandbar',jp:'洲浜',kw:['celebration','long life'],
+  svg:()=>`<g transform="translate(0 6)"><circle cx="0" cy="-26" r="30"/><circle cx="-34" cy="18" r="30"/><circle cx="34" cy="18" r="30"/><circle r="22"/></g>`,
+  text:'The curving outline of a sandbar seen from above — a soft, auspicious shape long used in celebration decorations.'},
+ {id:'izutsu',cat:'objects',name:'Izutsu',en:'Well Frame',jp:'井筒',kw:['source','integrity'],
+  svg:()=>`<path d="M-40-64H-20V64H-40ZM20-64H40V64H20ZM-64-40H64V-20H-64ZM-64 20H64V40H-64Z"/>`,
+  text:'The square timber frame around the mouth of a well, drawn upright. A cousin of the diamond-turned well curb.'},
+ {id:'chigiri',cat:'objects',name:'Chigiri',en:'Butterfly Joint',jp:'千切り',kw:['bonds','craftsmanship'],
+  svg:()=>`<path d="M-66-44L-8-16H8L66-44V44L8 16H-8L-66 44Z"/>`,
+  text:'The bow-tie shaped wooden key a carpenter sets across a joint to hold two boards together — a picture of things bound fast.'},
+ {id:'torii',cat:'objects',name:'Torii',en:'Shrine Gate',jp:'鳥居',kw:['the sacred','passage'],
+  svg:()=>`<g transform="translate(0 4)"><path d="M-74-56Q0-46 74-56L70-42Q0-34-70-42Z"/><rect x="-58" y="-36" width="116" height="8"/><rect x="-56" y="-18" width="112" height="10"/>`+
+   `<rect x="-5" y="-30" width="10" height="14"/><path d="M-44-28H-32L-30 66H-46ZM32-28H44L46 66H30Z"/></g>`,
+  text:'The gate that marks the entrance to a Shinto shrine, where the everyday world gives way to sacred ground.'},
+ {id:'fune',cat:'objects',name:'Hokake-bune',en:'Sailing Ship',jp:'帆掛船',kw:['voyage','progress'],
+  svg:()=>`<g transform="translate(0 2)"><path d="M-70 30H70L54 56H-54Z"/><rect x="-3" y="-66" width="6" height="96"/>`+
+   `<path d="M-46-56H46V20H-46Z"/><path d="M-46-36H46M-46-16H46M-46 4H46M-24-56V20M0-56V20M24-56V20" stroke="${P}" stroke-width="2.4"/>`+
+   `<path d="M-3-66L-60 30M3-66L60 30" stroke="currentColor" stroke-width="1.8"/></g>`,
+  text:'A ship running before the wind under a square sail — a hope for smooth passage and steady progress.'},
+ {id:'uchiwa',cat:'objects',name:'Uchiwa',en:'Round Fan',jp:'団扇',kw:['command','cool composure'],
+  svg:()=>`<g transform="translate(0 -4)"><circle cy="-18" r="50"/>`+Array.from({length:9},(_,i)=>`<path d="M0 22L${f(48*Math.cos((-160+i*17.5)*Math.PI/180))} ${f(-18+48*Math.sin((-160+i*17.5)*Math.PI/180))}" stroke="${P}" stroke-width="1.8"/>`).join('')+
+   `<rect x="-6" y="28" width="12" height="44" rx="3"/><circle cy="30" r="9"/></g>`,
+  text:'A flat round fan. Warlords carried a war fan of this shape (gunbai) to signal orders, so the fan also stands for command.'},
+ {id:'kasa',cat:'objects',name:'Kasa',en:'Traveller’s Hat',jp:'笠',kw:['journey','humility'],
+  svg:()=>`<g transform="translate(0 10)"><path d="M-74 22Q0-74 74 22Q0 34-74 22Z"/>`+[-50,-25,0,25,50].map(x=>`<path d="M0-48L${x} 26" stroke="${P}" stroke-width="2"/>`).join('')+
+   `<path d="M-74 22Q0 34 74 22" fill="none" stroke="${P}" stroke-width="3"/><circle cy="-46" r="5"/></g>`,
+  text:'A wide woven hat of the kind worn by travellers, pilgrims and farmers — an image of the road and of quiet humility.'},
+ {id:'suisha',cat:'objects',name:'Suisha',en:'Water Wheel',jp:'水車',kw:['perseverance','cycles'],
+  svg:()=>`<path fill-rule="evenodd" d="${circ(58)+circ(48)+circ(14)+circ(7)}"/>`+
+   Array.from({length:6},(_,i)=>rot(i*60,`<path d="M-3-12L-3-50H3L3-12Z"/>`)).join('')+
+   Array.from({length:12},(_,i)=>rot(i*30,`<path d="M-7-56H7V-72H-7Z"/>`)).join(''),
+  text:'A water wheel with its paddles, turning endlessly as long as the stream runs — patient, steady work.'},
+ {id:'mokko',cat:'flowers',name:'Mokkō',en:'Quince Flower',jp:'木瓜',kw:['prosperity','family'],
+  svg:()=>{const lob=r=>[[34,0],[-34,0],[0,34],[0,-34]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('');
+   const p=`<path d="M0-12C-22-20-34-48-18-60C-10-66-3-62 0-56C3-62 10-66 18-60C34-48 22-20 0-12Z" ${sep}/>`;
+   return `<g transform="rotate(45)">${lob(38)}<g fill="${P}">${lob(30)}</g></g><g transform="scale(.6)">${[0,90,180,270].map(a=>rot(a,p)).join('')}</g><circle r="8"/><circle r="3.4" fill="${P}"/>`},
+  text:'A four-lobed outline around a small flower, said to depict a bird’s nest or the cut face of a melon and read as a wish for many descendants. A five-lobed version was the crest of the Oda, the family of Oda Nobunaga.'},
+ {id:'katabami',cat:'leaves',name:'Katabami',en:'Wood Sorrel',jp:'片喰',kw:['tenacity','growth'],
+  svg:()=>{const lf=`<path d="M0-6C-30-20-42-58-20-67C-9-71-2-64 0-55C2-64 9-71 20-67C42-58 30-20 0-6Z"/>`;return [0,120,240].map(a=>rot(a,lf)).join('')+`<circle r="7"/>`},
+  text:'Three heart-shaped leaves of wood sorrel, a small plant that spreads quickly and is almost impossible to uproot.'},
+ {id:'kenkatabami',cat:'leaves',name:'Ken-katabami',en:'Sorrel with Swords',jp:'剣片喰',kw:['tenacity','courage'],
+  svg:()=>{const lf=`<path d="M0-6C-26-18-36-50-18-58C-8-62-2-56 0-48C2-56 8-62 18-58C36-50 26-18 0-6Z"/>`,bl=`<path d="M0-18L-6-30L0-74L6-30Z"/><path d="M-10-26H10" stroke="currentColor" stroke-width="3"/>`;
+   return [0,120,240].map(a=>rot(a,lf)).join('')+[60,180,300].map(a=>rot(a,bl)).join('')+`<circle r="7"/>`},
+  text:'Wood-sorrel leaves with sword blades between them, adding a warrior’s edge to the plant’s tenacity.'},
+ {id:'karahana',cat:'flowers',name:'Karahana',en:'Chinese Flower',jp:'唐花',kw:['elegance','refinement'],
+  svg:()=>{const p=`<path d="M0-12C-22-20-34-48-18-60C-10-66-3-62 0-56C3-62 10-66 18-60C34-48 22-20 0-12Z" ${sep}/>`,s=`<path d="M0-14L-8-30L0-50L8-30Z"/>`;
+   return [45,135,225,315].map(a=>rot(a,p)).join('')+[0,90,180,270].map(a=>rot(a,s)).join('')+`<circle r="12"/><circle r="5" fill="${P}"/>`},
+  text:'An imaginary flower of continental style, one of the oldest ornamental motifs in Japanese court design and the centre of many larger crests.'},
 ];
 
 const PRESETS=[
@@ -388,12 +475,14 @@ const PRESETS=[
  {id:'matcha',name:'Moss & Rice',ink:'#4e5d2c',paper:'#efebd9'}
 ];
 
+let CID=0;
 function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false}={}){
  const fr=FRAMES.find(x=>x.id===s.frame)||FRAMES[0],mo=MOTIFS.find(x=>x.id===s.motif)||MOTIFS[0];
  const sc=f((motifOnly?1.15:fr.fit)*s.size/100);
  const bg=transparent?'':`<rect width="200" height="200" fill="${s.paper}"/>`;
  const frame=motifOnly||!fr.d?'':`<path d="${fr.d}" fill-rule="evenodd"/>`;
- const motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg()}</g>`;
+ let motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg()}</g>`;
+ if(motif&&mo.clip){const id='k'+(++CID);const inner=motifOnly?circ(90):(fr.inner||circ(90));motif=`<clipPath id="${id}"><path d="${inner}"/></clipPath><g clip-path="url(#${id})">${motif}</g>`}
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${bg}<g transform="translate(100 100)" fill="${s.ink}" color="${s.ink}">${frame}${motif}</g></svg>`
   .replace(/var\(--p\)/g,s.paper);
 }
@@ -402,7 +491,7 @@ const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f
 const load=()=>{try{const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const andList=k=>k.length>2?k.slice(0,-1).join(', ')+', and '+k.at(-1):k.join(' and ');
-const CATS=[['plants','Plants','植物'],['animals','Animals','動物'],['sky','Sky','天文'],['objects','Objects','器物'],['patterns','Patterns','文様']];
+const CATS=[['flowers','Flowers','花'],['leaves','Leaves','葉・木'],['animals','Animals','動物'],['sky','Sky','天文'],['objects','Objects','器物'],['patterns','Patterns','文様']];
 const TABS=[['frame','Frame'],['motif','Motif'],['adjust','Adjust'],['color','Colour'],['meaning','Meaning']];
 
 function App(){
