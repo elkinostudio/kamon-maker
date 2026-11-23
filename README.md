@@ -11,7 +11,7 @@ Design your own Japanese family crest (*kamon*) in the browser. Pick an outer fr
 ## Features
 
 - **6 outer frames** — None, Maru (Circle), Futae-maru (Double Circle), Sumikiri-kaku (Cut-corner Square), Kikkō (Tortoise Shell), Sumitate-kaku (Diamond Square)
-- **65 center motifs in 6 categories** — Flowers, Leaves & Trees, Animals, Sky & Nature, Objects, Patterns — all drawn as original vector artwork
+- **80 center motifs in 6 categories** — Flowers, Leaves & Trees, Animals, Sky & Nature, Objects, Patterns — all drawn as original vector artwork
 - **Size and rotation** controls
 - **Traditional colour presets** plus free colour pickers, with an optional transparent background
 - **Meaning & origin card** that describes your combination in English
@@ -19,6 +19,10 @@ Design your own Japanese family crest (*kamon*) in the browser. Pick an outer fr
 - **Download** as PNG (1024×1024, ideal for social media icons) or SVG
 - **One screen, no scrolling** — tabbed tool tray on phones, three-column workbench on desktop
 - Keyboard: ← → change motif, ↑ ↓ change frame, R randomizes
+
+## Support
+
+Kamon Maker is free. If you enjoy it, you can support the work on [Ko-fi](https://ko-fi.com/monojapan), or watch [the mono Japan film on kamon](https://youtu.be/bn1kcLV0_m4).
 
 ## Run locally
 
