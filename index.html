@@ -208,6 +208,13 @@ const stalk=(n)=>`<path d="M0 4V${-14-n*12}" stroke="currentColor" stroke-width=
 const wring=(cx)=>`<path d="${circAt(cx,44)}${circAt(cx,33)}" fill-rule="evenodd" ${sep}/>`;
 const half=(cx)=>{const a=d=>[Math.cos(d*Math.PI/180),Math.sin(d*Math.PI/180)],[c1,s1]=a(28),[c2,s2]=a(88),R=44,r=33,pt=(rr,c,s)=>`${f(cx+rr*c)} ${f(rr*s)}`;
  return `<path d="M${pt(R,c1,s1)}A${R} ${R} 0 0 1 ${pt(R,c2,s2)}L${pt(r,c2,s2)}A${r} ${r} 0 0 0 ${pt(r,c1,s1)}Z"/><path d="M${pt(R,c1,s1)}A${R} ${R} 0 0 1 ${pt(R,c2,s2)}M${pt(r,c2,s2)}A${r} ${r} 0 0 0 ${pt(r,c1,s1)}" fill="none" stroke="${P}" stroke-width="2.6"/>`};
+function ageha(){return `<g transform="translate(4 2)"><path d="M-14 4C-28-30-14-66 26-74C52-78 70-64 66-44C62-22 30-4-6 10Z" stroke="var(--p)" stroke-width="2.6" stroke-linejoin="round"/>`+
+ `<path d="M-4 14C22 4 50 12 54 34C56 44 48 48 52 66C40 60 34 56 28 54C10 50-2 34-4 14Z" stroke="var(--p)" stroke-width="2.6" stroke-linejoin="round"/>`+
+ `<path d="M-4-6L30-54M2 0L52-40M6 4L58-20M6 22L40 30M8 30L36 46" stroke="var(--p)" stroke-width="2" stroke-linecap="round"/>`+
+ `<path d="M-30-6C-22-10-6 8 12 40C14 46 8 48 4 44C-12 26-28 6-30-6Z" stroke="var(--p)" stroke-width="2.6"/>`+
+ `<circle cx="-32" cy="-10" r="7" stroke="var(--p)" stroke-width="2"/>`+
+ `<path d="M-36-16Q-50-36-46-62M-30-17Q-36-40-26-62" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="-46" cy="-64" r="3.4"/><circle cx="-26" cy="-64" r="3.4"/>`+
+ `<path d="M-22 8L-40 22M-14 18L-30 34M-6 28L-18 46" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></g>`}
 const dia=(cx,cy,a)=>poly([[cx,cy-a],[cx+a,cy],[cx,cy+a],[cx-a,cy]]);
 
 const MOTIFS=[
@@ -556,6 +563,56 @@ const MOTIFS=[
    `<path d="M18-34L28-30L18-26Z"/><circle cx="8" cy="-34" r="2.6" fill="${P}"/><path d="M-8 2C-14 14-20 24-28 34M-2 6C-6 18-12 28-18 38" fill="none" stroke="${P}" stroke-width="2" stroke-linecap="round"/><path d="M-30 44L-44 62L-24 54Z"/></g>`;
    return d+`<g transform="scale(-1 1)">${d}</g>`},
   text:'Two doves turned towards each other. Paired birds facing one another suggest harmony and faithfulness.'},
+ /* ---- batch 3 ---- */
+ {id:'ageha',cat:'animals',name:'Ageha-chō',en:'Swallowtail Butterfly',jp:'揚羽蝶',kw:['transformation','elegance'],
+  svg:()=>ageha(),
+  text:'A swallowtail butterfly seen from the side, its wings raised above its body — a quieter, more poised pose than the open-winged butterfly.'},
+ {id:'mukaicho',cat:'animals',name:'Mukai-chō',en:'Facing Butterflies',jp:'向かい蝶',kw:['harmony','bonds'],
+  svg:()=>`<g transform="translate(-32 2) scale(-.6 .6)">${ageha()}</g><g transform="translate(32 2) scale(.6)">${ageha()}</g>`,
+  text:'Two swallowtails turned towards each other. Paired, facing designs suggest harmony and a bond between two.'},
+ {id:'futakarigane',cat:'animals',name:'Futatsu-karigane',en:'Two Wild Geese',jp:'二つ雁金',kw:['companionship','seasons'],
+  svg:()=>{const g=MOTIFS.find(m=>m.id==='karigane').svg();return `<g transform="translate(-16 -30) scale(.64)">${g}</g><g transform="translate(18 32) scale(.64)">${g}</g>`},
+  text:'Two wild geese flying one behind the other. Geese travel in company and return with each autumn.'},
+ {id:'mukaitsuru',cat:'animals',name:'Mukai-tsuru',en:'Facing Cranes',jp:'向かい鶴',kw:['long life','partnership'],
+  svg:()=>{const c=`<path d="M-8 14C-16-20-14-52 4-70C-26-66-58-48-70-14C-60-20-48-20-40-14C-52-6-58 6-58 18C-44 10-30 12-22 20Z" ${sep}/>`+
+   `<path d="M-20 22C-28 46-50 54-70 52L-58 44L-72 40L-56 36C-50 30-40 20-30 16Z" ${sep}/>`+
+   `<ellipse cx="-18" cy="24" rx="16" ry="12" ${sep}/>`+
+   `<path d="M-10 16C2 4 0-10-8-18" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><circle cx="-8" cy="-21" r="6"/><path d="M-4-24L-1-21L-4-18Z"/><circle cx="-8" cy="-23" r="1.8" fill="${P}"/>`+
+   `<path d="M-20 34L-26 66M-14 34L-12 66" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>`+
+   `<path d="M-40-50L-20-14M-56-30L-30-8" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`;
+   return `<g transform="translate(0 -2) scale(.92)">${c}<g transform="scale(-1 1)">${c}</g></g>`},
+  text:'Two cranes face each other with wings raised. A pair of cranes is a long-standing image of long life and a lasting partnership.'},
+ {id:'mitsuyama',cat:'sky',name:'Mitsu-yama',en:'Three Mountains',jp:'三つ山',kw:['steadfastness','aspiration'],
+  svg:()=>{const pk=(x,h,w)=>`<path d="M${x-w} 44Q${x-w*.45} ${44-h*.55} ${x-5} ${44-h}Q${x} ${44-h-4} ${x+5} ${44-h}Q${x+w*.45} ${44-h*.55} ${x+w} 44Z" ${sep}/>`;
+   return `<g transform="translate(0 4)">${pk(-36,66,42)+pk(36,66,42)+pk(0,104,50)}<rect x="-74" y="50" width="148" height="7" rx="3.5"/></g>`},
+  text:'Three peaks rising together, the tallest at the centre. Mountains in Japan have long been treated as sacred places.'},
+ {id:'hiogi',cat:'objects',name:'Hiōgi',en:'Cypress Court Fan',jp:'檜扇',kw:['dignity','prosperity'],
+  svg:()=>{const C=[0,50],n=13,a0=-90-58,a1=-90+58,pt=(r,a)=>[C[0]+r*Math.cos(a*Math.PI/180),C[1]+r*Math.sin(a*Math.PI/180)];
+   const sl=Array.from({length:n},(_,i)=>{const a=a0+i*(a1-a0)/(n-1),w=4.4;return poly([pt(10,a-1.2),pt(10,a+1.2),pt(92,a+w),pt(96,a),pt(92,a-w)])}).join('');
+   const top=a=>pt(80,a).map(f).join(' ');
+   return `<g transform="translate(0 -8)"><path d="${sl}" ${sep}/>`+
+   `<path d="M${top(a0)}Q${top(-90)} ${top(a1)}" transform="translate(0 0)" fill="none" stroke="${P}" stroke-width="2.4"/>`+
+   `<path d="M${top(a0)}C-80 40-62 54-70 70M${top(a1)}C80 40 62 54 70 70" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>`+
+   `<circle cx="-70" cy="72" r="5"/><circle cx="70" cy="72" r="5"/><circle cx="0" cy="50" r="6"/><circle cx="0" cy="50" r="2.2" fill="${P}"/></g>`},
+  text:'A fan made of thin slats of hinoki cypress tied together with thread. It was held by Heian-period aristocrats in formal dress and is still carried by Shinto priests today; like the folding fan, its widening shape was prized as auspicious.'},
+ {id:'futadomoe',cat:'patterns',name:'Futatsu-domoe',en:'Two Comma Swirl',jp:'二つ巴',kw:['balance','cycles of life'],
+  svg:()=>{const p=tomoe();return [0,180].map(a=>rot(a,`<path d="${p}"/>`)).join('')},
+  text:'Two comma shapes chasing each other around a centre — a simpler, balanced form of the tomoe.'},
+ {id:'mitsumori',cat:'patterns',name:'Mitsumori-kikkō ni Hanabishi',en:'Three Shells with Flowers',jp:'三つ盛亀甲に花菱',kw:['longevity','abundance'],
+  svg:()=>{const R=33,hb=MOTIFS.find(m=>m.id==='hanabishi').svg(),C=[[0,-25],[-28.6,24.5],[28.6,24.5]];
+   return C.map(([x,y])=>`<g transform="translate(${x} ${y})"><path d="${poly(ngon(6,R-1,-Math.PI/2))}${poly(ngon(6,R-7.5,-Math.PI/2))}" fill-rule="evenodd"/><g transform="scale(.27)">${hb}</g></g>`).join('')},
+  text:'Three tortoise-shell hexagons stacked together, each holding a flower diamond. The hexagon recalls the tortoise and long life; heaping three together adds a sense of abundance.'},
+ {id:'kaede',cat:'leaves',name:'Kaede',en:'Maple Leaf',jp:'楓',kw:['the seasons','maturity'],
+  svg:()=>{const L=[[-90,72],[-50,64],[-130,64],[-10,52],[-170,52],[30,36],[-210,36]].sort((a,b)=>a[0]-b[0]),cy=8,P2=(r,a)=>[r*Math.cos(a*Math.PI/180),cy+r*Math.sin(a*Math.PI/180)].map(f).join(' ');
+   let d='M'+P2(26,-230);L.forEach(([a,l])=>{d+=`L${P2(l*.5,a-19)}L${P2(l*.75,a-10)}L${P2(l,a)}L${P2(l*.75,a+10)}L${P2(l*.5,a+19)}L${P2(26,a+20)}`});d+='Z';
+   return `<g transform="translate(0 -4)"><path d="${d}" stroke-linejoin="round"/>`+L.map(([a,l])=>`<path d="M${P2(6,a)}L${P2(l-10,a)}" stroke="${P}" stroke-width="2" stroke-linecap="round"/>`).join('')+
+   `<path d="M0 ${cy+20}L6 66" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></g>`},
+  text:'A maple leaf. Its colour turns with the autumn, and it has long stood for the changing seasons and for a beauty that deepens with time.'},
+ {id:'nadeshiko',cat:'flowers',name:'Nadeshiko',en:'Fringed Pink',jp:'撫子',kw:['gentleness','quiet strength'],
+  svg:()=>{const pet=Array.from({length:5},(_,i)=>{const b=-90+i*72,pt=(r,a)=>[r*Math.cos(a*Math.PI/180),r*Math.sin(a*Math.PI/180)],o=[pt(10,b-14)];
+    for(let k=0;k<=8;k++){const a=b-30+k*60/8;o.push(pt(k%2?58:72,a))}o.push(pt(10,b+14));return poly(o)}).join('');
+   return `<path d="${pet}" ${sep}/><circle r="13" fill="${P}"/><circle r="6"/>`+Array.from({length:5},(_,i)=>{const a=(-90+i*72)*Math.PI/180;return `<path d="M${f(16*Math.cos(a))} ${f(16*Math.sin(a))}L${f(40*Math.cos(a))} ${f(40*Math.sin(a))}" stroke="${P}" stroke-width="2"/>`}).join('')},
+  text:'The fringed wild pink, a small flower of Japan’s fields and riverbanks. Its delicate, finely cut petals suggest gentleness and quiet strength.'},
 ];
 
 const PRESETS=[
@@ -582,7 +639,7 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
 const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false};
 const load=()=>{try{const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
-const UPRIGHT=new Set(["chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
+const UPRIGHT=new Set(["chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
 const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const andList=k=>k.length>2?k.slice(0,-1).join(', ')+', and '+k.at(-1):k.join(' and ');
