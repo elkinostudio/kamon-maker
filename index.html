@@ -582,6 +582,8 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
 const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false};
 const load=()=>{try{const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
+const UPRIGHT=new Set(["chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
+const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const andList=k=>k.length>2?k.slice(0,-1).join(', ')+', and '+k.at(-1):k.join(' and ');
 const CATS=[['flowers','Flowers','花'],['leaves','Leaves','葉・木'],['animals','Animals','動物'],['sky','Sky','天文'],['objects','Objects','器物'],['patterns','Patterns','文様']];
@@ -604,7 +606,7 @@ function App(){
  useEffect(()=>{let live=true;window.claude?.use?.('downloads').then(d=>{if(live)dl.current=d}).catch(()=>{});return()=>{live=false}},[]);
  useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),2400);return()=>clearTimeout(t)},[toast]);
  const set=p=>setS(o=>({...o,...p}));
- const step=useCallback((key,list,d)=>setS(o=>{const i=list.findIndex(x=>x.id===o[key]);return {...o,[key]:list[(i+d+list.length)%list.length].id}}),[]);
+ const step=useCallback((key,list,d)=>setS(o=>{const i=list.findIndex(x=>x.id===o[key]),id=list[(i+d+list.length)%list.length].id;return key==='motif'?{...o,motif:id,rot:upr(id,o.rot)}:{...o,[key]:id}}),[]);
  useEffect(()=>{const k=e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return;
    if(e.key==='ArrowRight')step('motif',MOTIFS,1);else if(e.key==='ArrowLeft')step('motif',MOTIFS,-1);
    else if(e.key==='ArrowDown')step('frame',FRAMES,1);else if(e.key==='ArrowUp')step('frame',FRAMES,-1);
@@ -617,7 +619,7 @@ function App(){
  const kws=[...mo.kw,...(fr.kw||[])];
  const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}`;
 
- function randomize(){const p=pick(PRESETS);setS(o=>({...o,frame:pick(FRAMES).id,motif:pick(MOTIFS).id,size:85+Math.round(Math.random()*5)*5,rot:pick([0,0,0,0,15,30,45,90,180]),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
+ function randomize(){const p=pick(PRESETS),m=pick(MOTIFS).id;setS(o=>({...o,frame:pick(FRAMES).id,motif:m,size:85+Math.round(Math.random()*5)*5,rot:upr(m,pick([0,0,0,0,15,30,45,90,180])),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
  async function save(filename,data,fallback){const d=dl.current;
   if(d){try{await d.save({filename,data});done(filename);return}catch(e){if(e?.code==='declined'){setToast('Download cancelled');return}if(e?.code==='rate_limited'){setToast('One moment — try again');return}}}
   if(!window.claude){/* standalone (e.g. GitHub Pages): plain browser download */
@@ -635,7 +637,7 @@ function App(){
   if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)step('motif',MOTIFS,dx<0?1:-1)};
 
  const thumbS={...s,size:100,rot:0};
- const opt=(key,x,svg,label)=>html`<button key=${x.id} class="opt" aria-pressed=${s[key]===x.id} title=${label} aria-label=${label} onClick=${()=>set({[key]:x.id})}>
+ const opt=(key,x,svg,label)=>html`<button key=${x.id} class="opt" aria-pressed=${s[key]===x.id} title=${label} aria-label=${label} onClick=${()=>set(key==='motif'?{motif:x.id,rot:upr(x.id,s.rot)}:{[key]:x.id})}>
    <span class="th" dangerouslySetInnerHTML=${{__html:svg}}></span><span class="lb">${x.name}</span></button>`;
  const hid=id=>tab!==id;
 
