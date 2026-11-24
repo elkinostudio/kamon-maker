@@ -658,7 +658,16 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
 }
 
 const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false};
-const load=()=>{try{const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
+const SITE='https://elkinostudio.github.io/kamon-maker/';
+const HEX=/^[0-9a-f]{6}$/i;
+const encodeShare=o=>[o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0].join('.');
+const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr]=String(str||'').split('.');
+ if(!FRAMES.some(x=>x.id===fr)||!MOTIFS.some(x=>x.id===mo)||!HEX.test(ink||'')||!HEX.test(pa||''))return null;
+ const size=Math.min(130,Math.max(50,+sz||100)),rot=((Math.round(+ro||0)%360)+360)%360,i='#'+ink.toLowerCase(),q='#'+pa.toLowerCase();
+ const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1'}};
+const fromURL=(()=>{try{return decodeShare(new URLSearchParams(location.search).get('c'))}catch(e){return null}})();
+const shareURL=o=>SITE+'?c='+encodeShare(o);
+const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
 const UPRIGHT=new Set(["chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
 const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
@@ -675,8 +684,11 @@ function App(){
  const [toast,setToast]=useState('');
  const [modal,setModal]=useState(null);
  const [menu,setMenu]=useState(false);
+ const [smenu,setSmenu]=useState(false);
  const [thanks,setThanks]=useState(false);
  const thanked=useRef(false);
+ useEffect(()=>{if(!smenu)return;const c=()=>setSmenu(false);addEventListener('click',c);return()=>removeEventListener('click',c)},[smenu]);
+ useEffect(()=>{if(!fromURL)return;setToast('Shared crest loaded — make it yours');try{history.replaceState(null,'',location.pathname)}catch(e){}},[]);
  useEffect(()=>{if(!menu)return;const c=()=>setMenu(false);addEventListener('click',c);return()=>removeEventListener('click',c)},[menu]);
  const done=fn=>{setToast('Saved '+fn);if(!thanked.current){thanked.current=true;setTimeout(()=>setThanks(true),700)}};
  const dl=useRef(null);const touch=useRef(null);
@@ -709,6 +721,10 @@ function App(){
   img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=1024;c.getContext('2d').drawImage(img,0,0,1024,1024);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(),'image/png')};img.onerror=rej;img.src=url});
  const savePNG=async()=>{try{const b=await toPNG();save(fname+'.png',b,()=>setModal({type:'png',src:URL.createObjectURL(b)}))}catch(e){setToast('Could not render PNG')}};
  const saveSVG=()=>save(fname+'.svg',svgText(),()=>setModal({type:'svg',text:svgText()}));
+ const shareText=()=>`My Japanese family crest: ${fr.jp}${mo.jp} (${fr.id!=='none'?fr.ro+' ':''}${mo.name}). Make your own kamon:`;
+ const copyLink=async()=>{const u=shareURL(s);try{await navigator.clipboard.writeText(u);setToast('Link copied')}catch(e){setModal({type:'link',url:u})}};
+ const postX=()=>{window.open('https://x.com/intent/post?text='+encodeURIComponent(shareText())+'&url='+encodeURIComponent(shareURL(s)),'_blank','noopener')};
+ const nativeShare=async()=>{try{await navigator.share({title:'Kamon Maker',text:shareText(),url:shareURL(s)})}catch(e){if(e?.name!=='AbortError')copyLink()}};
  const copySVG=async t=>{try{await navigator.clipboard.writeText(t);setToast('SVG copied')}catch(e){setToast('Copy blocked — select the code instead')}};
  const onTS=e=>{touch.current=[e.touches[0].clientX,e.touches[0].clientY]};
  const onTE=e=>{if(!touch.current)return;const dx=e.changedTouches[0].clientX-touch.current[0],dy=e.changedTouches[0].clientY-touch.current[1];touch.current=null;
@@ -725,7 +741,9 @@ function App(){
    <div class="acts">
     <a class="btn kofi" href="https://ko-fi.com/monojapan" target="_blank" rel="noopener" aria-label="Support mono Japan on Ko-fi"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 6h14v7a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V6zm14 1h1.5a3 3 0 0 1 0 6H17v-2h1.5a1 1 0 0 0 0-2H17V7z"/><path fill="#ff5e5b" d="M10 9.2c.9-1.2 2.9-.6 2.6 1-.2 1.1-1.6 2-2.6 2.6-1-.6-2.4-1.5-2.6-2.6-.3-1.6 1.7-2.2 2.6-1z"/></svg><span class="hide-s">Support</span></a>
     <a class="btn yt" href="https://www.youtube.com/@mono_Japan" target="_blank" rel="noopener" aria-label="mono Japan on YouTube"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#e62117" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8z"/><path fill="#fff" d="M9.8 15.1V8.9l5.4 3.1z"/></svg><span class="hide-m">YouTube</span></a>
-    <div class="savewrap"><button class="btn ink" aria-haspopup="menu" aria-expanded=${menu} onClick=${e=>{e.stopPropagation();setMenu(m=>!m)}}>Save<span aria-hidden="true">▾</span></button>
+    <div class="savewrap"><button class="btn" aria-haspopup="menu" aria-expanded=${smenu} aria-label="Share your crest" onClick=${e=>{e.stopPropagation();setMenu(false);setSmenu(m=>!m)}}><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="hide-s">Share</span></button>
+     ${smenu&&html`<div class="menu" role="menu"><button role="menuitem" onClick=${()=>{setSmenu(false);copyLink()}}><b>Copy link</b><span>Anyone who opens it sees this crest</span></button><button role="menuitem" onClick=${()=>{setSmenu(false);postX()}}><b>Post on X</b><span>Share with a link to your crest</span></button>${typeof navigator!=='undefined'&&navigator.share&&html`<button role="menuitem" onClick=${()=>{setSmenu(false);nativeShare()}}><b>More…</b><span>Instagram, LINE, Messages and others</span></button>`}</div>`}</div>
+    <div class="savewrap"><button class="btn ink" aria-haspopup="menu" aria-expanded=${menu} onClick=${e=>{e.stopPropagation();setSmenu(false);setMenu(m=>!m)}}>Save<span aria-hidden="true">▾</span></button>
      ${menu&&html`<div class="menu" role="menu"><button role="menuitem" onClick=${()=>{setMenu(false);savePNG()}}><b>PNG</b><span>1024 × 1024 · for icons & social</span></button><button role="menuitem" onClick=${()=>{setMenu(false);saveSVG()}}><b>SVG</b><span>Vector · scales to any size</span></button></div>`}</div>
    </div>
   </header>
@@ -780,8 +798,8 @@ function App(){
   </main>
 
   ${modal&&html`<div class="modal" onClick=${e=>{if(e.target===e.currentTarget)setModal(null)}}><div class="box">
-   <h3>${modal.type==='png'?'Save your PNG':'Your SVG'}</h3>
-   ${modal.type==='png'?html`<img src=${modal.src} alt="Your crest, 1024 by 1024 PNG"/><p>Downloads aren’t available in this view. Long-press (phone) or right-click (desktop) the image to save it.</p>`
+   <h3>${modal.type==='png'?'Save your PNG':modal.type==='link'?'Share link':'Your SVG'}</h3>
+   ${modal.type==='link'?html`<input readonly style=${{width:'100%',font:'13px monospace',borderRadius:'8px',padding:'10px',border:'1px solid var(--line)'}} value=${modal.url} onFocus=${e=>e.target.select()}/><p>Copy this link and paste it anywhere.</p>`:modal.type==='png'?html`<img src=${modal.src} alt="Your crest, 1024 by 1024 PNG"/><p>Downloads aren’t available in this view. Long-press (phone) or right-click (desktop) the image to save it.</p>`
     :html`<textarea readonly style=${{width:'100%',height:'160px',font:'12px monospace',borderRadius:'8px',padding:'8px'}} value=${modal.text}></textarea><button class="btn ink" onClick=${()=>copySVG(modal.text)}>Copy SVG code</button>`}
    <button class="btn" onClick=${()=>setModal(null)}>Close</button></div></div>`}
   ${thanks&&html`<aside class="thanks" role="dialog" aria-label="Thank you"><button class="x" aria-label="Close" onClick=${()=>setThanks(false)}>×</button>
