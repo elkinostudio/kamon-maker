@@ -32,7 +32,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .kofi svg{color:var(--ink)}
 .savewrap{position:relative}
 .letterrow{display:flex;align-items:center;gap:10px;margin:0 0 8px;flex-wrap:wrap}
-.letterrow label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.lstep{display:flex;align-items:center;gap:6px}
+.lnav{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:20px;line-height:1}
 .letterin{width:52px;height:40px;text-align:center;font-size:22px;font-weight:600;text-transform:uppercase;border:1px solid var(--line);border-radius:9px;background:var(--card);color:inherit}
 .seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:0 12px;min-height:36px;font-size:13px}
@@ -896,7 +897,7 @@ function App(){
     <div class="grid">${FRAMES.map(x=>opt('frame',x,buildSVG({...thumbS,frame:x.id},{size:46,frameOnly:x.id!=='none'}),x.name+(x.en?' — '+x.en:'')))}</div></section>
 
    <section class="panel p-motif" hidden=${hid('motif')}><h3>Center motif <em>${mo.name} · ${mo.en}</em></h3>
-    ${s.motif==='initial'&&html`<div class="letterrow"><label>Letter <input class="letterin" value=${s.letter} maxlength="1" autocapitalize="characters" aria-label="Your letter, A to Z" onFocus=${e=>e.target.select()} onInput=${e=>{const v=(e.target.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(-1);if(v)set({letter:v});e.target.value=v||s.letter}}/></label><div class="seg" role="group" aria-label="Letter style"><button aria-pressed=${s.lstyle!=='solid'} onClick=${()=>set({lstyle:'inlay'})}>Inlay</button><button aria-pressed=${s.lstyle==='solid'} onClick=${()=>set({lstyle:'solid'})}>Solid</button></div></div>`}
+    ${s.motif==='initial'&&html`<div class="letterrow"><div class="lstep"><button class="lnav" aria-label="Previous letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+25)%26+65)})}>‹</button><input class="letterin" value=${s.letter} autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Your letter, A to Z — tap and type" onFocus=${e=>{try{e.target.select()}catch(_){}}} onInput=${e=>{const v=(e.target.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(-1);if(v)set({letter:v});e.target.value=v||s.letter}}/><button class="lnav" aria-label="Next letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+1)%26+65)})}>›</button></div><div class="seg" role="group" aria-label="Letter style"><button aria-pressed=${s.lstyle!=='solid'} onClick=${()=>set({lstyle:'inlay'})}>Inlay</button><button aria-pressed=${s.lstyle==='solid'} onClick=${()=>set({lstyle:'solid'})}>Solid</button></div></div>`}
     <div class="cats" role="tablist" aria-label="Motif categories">${CATS.map(([id,l,j])=>html`<button key=${id} role="tab" aria-selected=${cat===id} onClick=${()=>setCat(id)}><span>${l}</span><small>${j}</small></button>`)}</div>
     <div class="grid m">${MOTIFS.filter(x=>x.cat===cat).map(x=>opt('motif',x,buildSVG({...thumbS,motif:x.id},{size:46,motifOnly:true}),x.name+' — '+x.en))}</div></section>
 
