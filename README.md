@@ -12,7 +12,8 @@ Design your own Japanese family crest (*kamon*) in the browser. Pick an outer fr
 
 - **6 outer frames** — None, Maru (Circle), Futae-maru (Double Circle), Sumikiri-kaku (Cut-corner Square), Kikkō (Tortoise Shell), Sumitate-kaku (Diamond Square)
 - **103 center motifs in 7 categories** — Flowers, Leaves & Trees, Animals, Sky & Nature, Objects, Patterns — all drawn as original vector artwork — plus **Modern**: 12 original crest-style designs (cat, shiba, fox, owl, koi, whale, Mount Fuji and more) and an **Initial** crest for any letter A–Z, clearly marked as new creations rather than traditional family crests
-- **Size and rotation** controls
+- **Size, rotation and position** controls — nudge any motif left, right, up or down
+- **Combine two motifs** — add a second motif, then size and place it freely (e.g. a cherry blossom with a crescent moon)
 - **Traditional colour presets** plus free colour pickers, with an optional transparent background
 - **Meaning & origin card** that describes your combination in English
 - **Randomize** with one tap

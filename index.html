@@ -38,6 +38,11 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:0 12px;min-height:36px;font-size:13px}
 .seg button[aria-pressed=true]{background:var(--sel);color:var(--selink)}
+.layers{display:flex;gap:4px;margin:0 0 8px;flex-wrap:wrap}
+.layers button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 12px;min-height:34px;font-size:12.5px}
+.layers button[aria-pressed=true]{background:var(--sel);border-color:var(--sel);color:var(--selink)}
+.layers .rm{margin-left:auto;color:var(--shu);border-color:transparent}
+.hint{font-size:13px;color:var(--mute);margin:4px 0}
 .orig{font-size:12px;color:var(--shu);margin:0 0 6px;font-weight:500}
 .menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.3);padding:6px;z-index:8;min-width:230px;display:grid}
 .menu button{display:grid;text-align:left;gap:1px;border:0;background:transparent;border-radius:8px;padding:9px 12px;min-height:44px}
@@ -774,28 +779,37 @@ const PRESETS=[
 ];
 
 let CID=0;
+const CEN={"uroko":[0,-12.2,0.911],"kiri":[0,-3.5,1],"cho":[0,-2.9,1],"usagi":[1.5,-6.6,0.957],"tonbo":[0,4.3,0.972],"fuji":[0,11.8,1],"sasa":[0,-12.2,0.923],"karigane":[5,0.1,1],"tsuru":[-6.6,-7.7,0.911],"kumo":[0,-3,0.984],"seigaiha":[0,6,1],"hitouroko":[0,-6,0.954],"torii":[0,9,0.943],"fune":[0,-3,0.973],"sasarindo":[0,-5.4,1],"sagarifuji":[0,-12.1,1],"tachibana":[0,-4.2,1],"tsuta":[0,-3,1],"matsu":[0,3.5,1],"ine":[0,-3.1,1],"futabaaoi":[0,7.7,1],"hato":[0,13.5,1],"mukaicho":[0,-2.8,1],"futakarigane":[4.2,1,0.952],"mukaitsuru":[0,5.9,1],"hiogi":[0,7.5,1],"kaede":[0,-3,1],"nikukyu":[0,6.9,1],"shiba":[0,-3,1],"kitsune":[0,-3,1],"tsukineko":[-6.7,-0.2,1],"fujinami":[0,10.8,0.979],"nagareboshi":[-5.4,3.8,1],"kujira":[4,4,1]};
 function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false}={}){
  const fr=FRAMES.find(x=>x.id===s.frame)||FRAMES[0],mo=MOTIFS.find(x=>x.id===s.motif)||MOTIFS[0];
- const sc=f((motifOnly?1.15:fr.fit)*s.size/100);
+ const one=(m,size,rot,x,y,halo)=>{const c=CEN[m.id]||[0,0,1],sc=f((motifOnly?1.15:fr.fit)*size/100*(c[2]||1));
+  let g=`<g transform="translate(${f(x)} ${f(y)}) rotate(${rot}) scale(${sc}) translate(${-c[0]} ${-c[1]})">${m.svg(s)}</g>`;
+  if(halo){const h='h'+(++CID);g=`<filter id="${h}" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.6" result="d"/><feFlood flood-color="${s.paper}"/><feComposite in2="d" operator="in" result="o"/><feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#${h})">${g}</g>`}
+  if(m.clip){const id='k'+(++CID);const inner=motifOnly?circ(90):(fr.inner||circ(90));g=`<clipPath id="${id}"><path d="${inner}"/></clipPath><g clip-path="url(#${id})">${g}</g>`}
+  return g};
+ const m2=!motifOnly&&s.m2?MOTIFS.find(x=>x.id===s.m2):null;
  const bg=transparent?'':`<rect width="200" height="200" fill="${s.paper}"/>`;
  const frame=motifOnly||!fr.d?'':`<path d="${fr.d}" fill-rule="evenodd"/>`;
- let motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg(s)}</g>`;
- if(motif&&mo.clip){const id='k'+(++CID);const inner=motifOnly?circ(90):(fr.inner||circ(90));motif=`<clipPath id="${id}"><path d="${inner}"/></clipPath><g clip-path="url(#${id})">${motif}</g>`}
+ const motif=frameOnly?'':one(mo,s.size,s.rot,motifOnly?0:(s.dx||0),motifOnly?0:(s.dy||0))+(m2?one(m2,s.s2||45,s.r2||0,s.x2||0,s.y2||0,true):'');
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${bg}<g transform="translate(100 100)" fill="${s.ink}" color="${s.ink}">${frame}${motif}</g></svg>`
   .replace(/var\(--p\)/g,s.paper);
 }
 
-const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'inlay'};
+const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'inlay',dx:0,dy:0,m2:'',s2:45,r2:0,x2:0,y2:0};
 const SITE='https://elkinostudio.github.io/kamon-maker/';
 const HEX=/^[0-9a-f]{6}$/i;
-const encodeShare=o=>[o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0].concat(o.motif==='initial'?[(o.letter||'A')+(o.lstyle==='solid'?'s':'i')]:[]).join('.');
-const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr,lt]=String(str||'').split('.');
+const encodeShare=o=>{const x=[];if(o.motif==='initial'||o.m2==='initial')x.push((o.letter||'A')+(o.lstyle==='solid'?'s':'i'));if(o.dx||o.dy)x.push('o'+o.dx+'~'+o.dy);if(o.m2)x.push('b'+[o.m2,o.s2,o.r2,o.x2,o.y2].join('~'));return [o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0,...x].join('.')};
+const clampN=(v,a,b,d)=>{v=Math.round(+v);return Number.isFinite(v)?Math.min(b,Math.max(a,v)):d};
+const decodeExtra=ex=>{const o={};for(const t of ex){if(/^[A-Z][is]$/.test(t)){o.letter=t[0];o.lstyle=t[1]==='s'?'solid':'inlay'}
+ else if(t[0]==='o'){const [x,y]=t.slice(1).split('~');o.dx=clampN(x,-40,40,0);o.dy=clampN(y,-40,40,0)}
+ else if(t[0]==='b'){const [id,sz,r,x,y]=t.slice(1).split('~');if(MOTIFS.some(m=>m.id===id)){o.m2=id;o.s2=clampN(sz,20,100,45);o.r2=((clampN(r,-720,720,0)%360)+360)%360;o.x2=clampN(x,-60,60,0);o.y2=clampN(y,-60,60,0)}}}return o};
+const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr,...ex]=String(str||'').split('.');
  if(!FRAMES.some(x=>x.id===fr)||!MOTIFS.some(x=>x.id===mo)||!HEX.test(ink||'')||!HEX.test(pa||''))return null;
  const size=Math.min(130,Math.max(50,+sz||100)),rot=((Math.round(+ro||0)%360)+360)%360,i='#'+ink.toLowerCase(),q='#'+pa.toLowerCase();
- const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1',...(/^[A-Z][is]$/.test(lt||'')?{letter:lt[0],lstyle:lt[1]==='s'?'solid':'inlay'}:{})}};
+ const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1',...decodeExtra(ex)}};
 const fromURL=(()=>{try{return decodeShare(new URLSearchParams(location.search).get('c'))}catch(e){return null}})();
 const shareURL=o=>SITE+'?c='+encodeShare(o);
-const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';if(!/^[A-Z]$/.test(o.letter||''))o.letter='A';return o}catch(e){return DEFAULT}};
+const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';if(!/^[A-Z]$/.test(o.letter||''))o.letter='A';if(o.m2&&!MOTIFS.some(m=>m.id===o.m2))o.m2='';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
 const UPRIGHT=new Set(["initial", "neko","nikukyu","shiba","kitsune","kingyo","fukuro","tsukineko","fujinami","nagareboshi","kujira", "chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
 const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
@@ -813,6 +827,7 @@ function App(){
  const [modal,setModal]=useState(null);
  const [menu,setMenu]=useState(false);
  const [smenu,setSmenu]=useState(false);
+ const [layer,setLayer]=useState('main');
  const [thanks,setThanks]=useState(false);
  const thanked=useRef(false);
  useEffect(()=>{if(!smenu)return;const c=()=>setSmenu(false);addEventListener('click',c);return()=>removeEventListener('click',c)},[smenu]);
@@ -831,14 +846,16 @@ function App(){
    else if(e.key==='r'||e.key==='R')randomize();else return;e.preventDefault()};
   addEventListener('keydown',k);return()=>removeEventListener('keydown',k)},[step]);
 
- const fr=FRAMES.find(x=>x.id===s.frame),mo0=MOTIFS.find(x=>x.id===s.motif),mo=mo0.id==='initial'?{...mo0,jp:s.letter,name:'Initial '+s.letter,en:'Letter '+s.letter}:mo0;
+ const disp=m=>m&&m.id==='initial'?{...m,jp:s.letter,name:'Initial '+s.letter,en:'Letter '+s.letter}:m;
+ const fr=FRAMES.find(x=>x.id===s.frame),mA=disp(MOTIFS.find(x=>x.id===s.motif)),mB=disp(s.m2?MOTIFS.find(x=>x.id===s.m2):null);
+ const mo=mB?{...mA,jp:mA.jp+'と'+mB.jp,name:mA.name+' & '+mB.name,en:mA.en+' & '+mB.en,kw:[...new Set([...mA.kw,...mB.kw])],orig:mA.orig||mB.orig}:mA;
  useEffect(()=>{setCat(mo.cat)},[mo.id]);
  useEffect(()=>{try{document.querySelector('.cats [aria-selected=true]')?.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}},[cat]);
  const preview=useMemo(()=>buildSVG(s,{size:600}),[s]);
  const kws=[...mo.kw,...(fr.kw||[])];
- const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}${mo.id==='initial'?'-'+s.letter:''}`;
+ const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}${mA.id==='initial'?'-'+s.letter:''}${mB?'-'+mB.id:''}`;
 
- function randomize(){const p=pick(PRESETS),m=pick(MOTIFS).id;setS(o=>({...o,letter:m==='initial'?pick([...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']):o.letter,frame:pick(FRAMES).id,motif:m,size:85+Math.round(Math.random()*5)*5,rot:upr(m,pick([0,0,0,0,15,30,45,90,180])),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
+ function randomize(){const p=pick(PRESETS),m=pick(MOTIFS).id;setS(o=>({...o,letter:m==='initial'?pick([...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']):o.letter,frame:pick(FRAMES).id,motif:m,size:85+Math.round(Math.random()*5)*5,rot:upr(m,pick([0,0,0,0,15,30,45,90,180])),ink:p.ink,paper:p.paper,preset:p.id,dx:0,dy:0,m2:''}));setLayer('main');setPop(n=>n+1)}
  async function save(filename,data,fallback){const d=dl.current;
   if(d){try{await d.save({filename,data});done(filename);return}catch(e){if(e?.code==='declined'){setToast('Download cancelled');return}if(e?.code==='rate_limited'){setToast('One moment — try again');return}}}
   if(!window.claude){/* standalone (e.g. GitHub Pages): plain browser download */
@@ -859,8 +876,8 @@ function App(){
  const onTE=e=>{if(!touch.current)return;const dx=e.changedTouches[0].clientX-touch.current[0],dy=e.changedTouches[0].clientY-touch.current[1];touch.current=null;
   if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)step('motif',MOTIFS,dx<0?1:-1)};
 
- const thumbS={...s,size:100,rot:0};
- const opt=(key,x,svg,label)=>html`<button key=${x.id} class="opt" aria-pressed=${s[key]===x.id} title=${label} aria-label=${label} onClick=${()=>set(key==='motif'?{motif:x.id,rot:upr(x.id,s.rot)}:{[key]:x.id})}>
+ const thumbS={...s,size:100,rot:0,dx:0,dy:0,m2:''};
+ const opt=(key,x,svg,label)=>html`<button key=${x.id} class="opt" aria-pressed=${s[key]===x.id} title=${label} aria-label=${label} onClick=${()=>set(key==='motif'?{motif:x.id,rot:upr(x.id,s.rot)}:key==='m2'?{m2:x.id,r2:upr(x.id,s.r2||0),...(s.m2?{}:{s2:45,x2:0,y2:0})}:{[key]:x.id})}>
    <span class="th" dangerouslySetInnerHTML=${{__html:svg}}></span><span class="lb">${x.name}</span></button>`;
  const hid=id=>tab!==id;
 
@@ -896,15 +913,20 @@ function App(){
    <section class="panel p-frame" hidden=${hid('frame')}><h3>Outer frame <em>${fr.name}${fr.en?' · '+fr.en:''}</em></h3>
     <div class="grid">${FRAMES.map(x=>opt('frame',x,buildSVG({...thumbS,frame:x.id},{size:46,frameOnly:x.id!=='none'}),x.name+(x.en?' — '+x.en:'')))}</div></section>
 
-   <section class="panel p-motif" hidden=${hid('motif')}><h3>Center motif <em>${mo.name} · ${mo.en}</em></h3>
-    ${s.motif==='initial'&&html`<div class="letterrow"><div class="lstep"><button class="lnav" aria-label="Previous letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+25)%26+65)})}>‹</button><input class="letterin" value=${s.letter} autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Your letter, A to Z — tap and type" onFocus=${e=>{try{e.target.select()}catch(_){}}} onInput=${e=>{const v=(e.target.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(-1);if(v)set({letter:v});e.target.value=v||s.letter}}/><button class="lnav" aria-label="Next letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+1)%26+65)})}>›</button></div><div class="seg" role="group" aria-label="Letter style"><button aria-pressed=${s.lstyle!=='solid'} onClick=${()=>set({lstyle:'inlay'})}>Inlay</button><button aria-pressed=${s.lstyle==='solid'} onClick=${()=>set({lstyle:'solid'})}>Solid</button></div></div>`}
+   <section class="panel p-motif" hidden=${hid('motif')}><h3>Center motif <em>${layer==='main'?mA.name+' · '+mA.en:mB?mB.name+' · '+mB.en:'Pick a second motif'}</em></h3>
+    <div class="layers" role="group" aria-label="Which motif to edit"><button aria-pressed=${layer==='main'} onClick=${()=>setLayer('main')}>Main motif</button><button aria-pressed=${layer==='second'} onClick=${()=>setLayer('second')}>${s.m2?'Second motif':'+ Add a second'}</button>${layer==='second'&&s.m2&&html`<button class="rm" onClick=${()=>{set({m2:''});setLayer('main')}}>Remove</button>`}</div>
+    ${(layer==='main'?s.motif:s.m2)==='initial'&&html`<div class="letterrow"><div class="lstep"><button class="lnav" aria-label="Previous letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+25)%26+65)})}>‹</button><input class="letterin" value=${s.letter} autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Your letter, A to Z — tap and type" onFocus=${e=>{try{e.target.select()}catch(_){}}} onInput=${e=>{const v=(e.target.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(-1);if(v)set({letter:v});e.target.value=v||s.letter}}/><button class="lnav" aria-label="Next letter" onClick=${()=>set({letter:String.fromCharCode((s.letter.charCodeAt(0)-65+1)%26+65)})}>›</button></div><div class="seg" role="group" aria-label="Letter style"><button aria-pressed=${s.lstyle!=='solid'} onClick=${()=>set({lstyle:'inlay'})}>Inlay</button><button aria-pressed=${s.lstyle==='solid'} onClick=${()=>set({lstyle:'solid'})}>Solid</button></div></div>`}
     <div class="cats" role="tablist" aria-label="Motif categories">${CATS.map(([id,l,j])=>html`<button key=${id} role="tab" aria-selected=${cat===id} onClick=${()=>setCat(id)}><span>${l}</span><small>${j}</small></button>`)}</div>
-    <div class="grid m">${MOTIFS.filter(x=>x.cat===cat).map(x=>opt('motif',x,buildSVG({...thumbS,motif:x.id},{size:46,motifOnly:true}),x.name+' — '+x.en))}</div></section>
+    <div class="grid m">${MOTIFS.filter(x=>x.cat===cat).map(x=>opt(layer==='main'?'motif':'m2',x,buildSVG({...thumbS,motif:x.id},{size:46,motifOnly:true}),x.name+' — '+x.en))}</div></section>
 
-   <section class="panel p-adjust" hidden=${hid('adjust')}><h3>Size & rotation</h3>
-    <div class="row"><label for="sz">Size</label><input id="sz" type="range" min="50" max="140" step="1" value=${s.size} onInput=${e=>set({size:+e.target.value})}/><output>${s.size}%</output></div>
-    <div class="row"><label for="rt">Rotation</label><input id="rt" type="range" min="0" max="360" step="1" value=${s.rot} onInput=${e=>set({rot:+e.target.value})}/><output>${s.rot}°</output></div>
-    <div class="quick">${[0,45,90,180].map(a=>html`<button key=${a} class="chip" onClick=${()=>set({rot:a})}>${a}°</button>`)}<button class="chip" onClick=${()=>set({size:100,rot:0})}>Reset</button></div>
+   <section class="panel p-adjust" hidden=${hid('adjust')}><h3>Size & position</h3>
+    <div class="layers" role="group" aria-label="Which motif to adjust"><button aria-pressed=${layer==='main'} onClick=${()=>setLayer('main')}>Main motif</button><button aria-pressed=${layer==='second'} onClick=${()=>setLayer('second')}>Second motif</button></div>
+    ${layer==='second'&&!s.m2?html`<p class="hint">Open the <b>Motif</b> tab, choose <b>+ Add a second</b>, and pick a motif to combine.</p>`:(()=>{const k=layer==='main'?{sz:'size',rt:'rot',x:'dx',y:'dy',min:50,max:140,lim:40}:{sz:'s2',rt:'r2',x:'x2',y:'y2',min:20,max:100,lim:60};return html`
+    <div class="row"><label for="sz">Size</label><input id="sz" type="range" min=${k.min} max=${k.max} step="1" value=${s[k.sz]} onInput=${e=>set({[k.sz]:+e.target.value})}/><output>${s[k.sz]}%</output></div>
+    <div class="row"><label for="rt">Rotation</label><input id="rt" type="range" min="0" max="360" step="1" value=${s[k.rt]} onInput=${e=>set({[k.rt]:+e.target.value})}/><output>${s[k.rt]}°</output></div>
+    <div class="row"><label for="mx">Left · Right</label><input id="mx" type="range" min=${-k.lim} max=${k.lim} step="1" value=${s[k.x]} onInput=${e=>set({[k.x]:+e.target.value})}/><output>${s[k.x]}</output></div>
+    <div class="row"><label for="my">Up · Down</label><input id="my" type="range" min=${-k.lim} max=${k.lim} step="1" value=${s[k.y]} onInput=${e=>set({[k.y]:+e.target.value})}/><output>${s[k.y]}</output></div>
+    <div class="quick">${[0,45,90,180].map(a=>html`<button key=${a} class="chip" onClick=${()=>set({[k.rt]:a})}>${a}°</button>`)}<button class="chip" onClick=${()=>set(layer==='main'?{size:100,rot:0,dx:0,dy:0}:{s2:45,r2:0,x2:0,y2:0})}>Reset</button></div>`})()}
    </section>
 
    <section class="panel p-color" hidden=${hid('color')}><h3>Traditional colours</h3>
@@ -920,7 +942,7 @@ function App(){
    <section class="panel p-meaning" hidden=${hid('meaning')} aria-live="polite"><h3>Meaning & origin</h3>
     <div class="kw">${kws.map(k=>html`<span key=${k}>${k}</span>`)}</div>
     <p class="lead">${fr.id==='none'?`Unframed, the ${mo.en.toLowerCase()} speaks directly.`:`The ${fr.en.toLowerCase()} gathers the ${mo.en.toLowerCase()} into one emblem: ${mo.kw[0]} held within ${fr.kw[0]}.`}</p>
-    ${mo.orig&&html`<p class="orig">✦ Original design — a Kamon Maker creation, not a traditional family crest.</p>`}<p><b>${mo.name} · ${mo.jp}.</b> ${mo.text}</p>
+    ${mo.orig&&html`<p class="orig">✦ Original design — a Kamon Maker creation, not a traditional family crest.</p>`}<p><b>${mA.name} · ${mA.jp}.</b> ${mA.text}</p>${mB&&html`<p><b>${mB.name} · ${mB.jp}.</b> ${mB.text}</p>`}
     ${fr.id!=='none'&&html`<p><b>${fr.name} · ${fr.jp.replace('に','')}.</b> ${fr.text}</p>`}
     <div class="links"><a href="https://youtu.be/bn1kcLV0_m4" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#e62117" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8z"/><path fill="#fff" d="M9.8 15.1V8.9l5.4 3.1z"/></svg><span>Watch our film on kamon</span></a><a href="https://ko-fi.com/monojapan" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 6h14v7a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V6zm14 1h1.5a3 3 0 0 1 0 6H17v-2h1.5a1 1 0 0 0 0-2H17V7z"/><path fill="#ff5e5b" d="M10 9.2c.9-1.2 2.9-.6 2.6 1-.2 1.1-1.6 2-2.6 2.6-1-.6-2.4-1.5-2.6-2.6-.3-1.6 1.7-2.2 2.6-1z"/></svg><span>Support mono Japan on Ko-fi</span></a></div>
     <small>Symbolic readings are traditional associations, not fixed rules. Your crest is an original design, not a registered family mon.</small>
