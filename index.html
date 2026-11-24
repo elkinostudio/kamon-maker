@@ -31,6 +31,12 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .seal{width:34px;height:34px;background:var(--shu);color:#fff7ea;display:grid;place-items:center;font:700 18px "Shippori Mincho",serif;border-radius:4px;flex:none}
 .kofi svg{color:var(--ink)}
 .savewrap{position:relative}
+.letterrow{display:flex;align-items:center;gap:10px;margin:0 0 8px;flex-wrap:wrap}
+.letterrow label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.letterin{width:52px;height:40px;text-align:center;font-size:22px;font-weight:600;text-transform:uppercase;border:1px solid var(--line);border-radius:9px;background:var(--card);color:inherit}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:0 12px;min-height:36px;font-size:13px}
+.seg button[aria-pressed=true]{background:var(--sel);color:var(--selink)}
 .orig{font-size:12px;color:var(--shu);margin:0 0 6px;font-weight:500}
 .menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.3);padding:6px;z-index:8;min-width:230px;display:grid}
 .menu button{display:grid;text-align:left;gap:1px;border:0;background:transparent;border-radius:8px;padding:9px 12px;min-height:44px}
@@ -230,6 +236,35 @@ const agehaNew=()=>{const fw='M-18 8C-24-24-6-56 26-70C44-78 62-68 58-50C54-30 3
  `<path d="M-38 2Q-54-18-52-46M-32 1Q-38-24-30-50" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="-52" cy="-48" r="3.6"/><circle cx="-30" cy="-52" r="3.6"/>`+
  `<path d="M-40 12C-48 20-46 30-38 30C-32 30-34 22-38 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`+
  `<path d="M-24 18L-32 40M-16 20L-20 44M-8 22L-6 46" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></g>`};
+
+const GLYPH={
+A:'M-34 52L0-52L34 52M-20 14H20',
+B:'M-28 0H4C42 0 42 52 4 52H-28V-52H2C36-52 36 0 2 0',
+C:'M32-34C22-50 8-54-2-54C-28-54-38-26-38 0C-38 26-28 54-2 54C8 54 22 50 32 34',
+D:'M-30-52V52H-6C26 52 38 30 38 0C38-30 26-52-6-52Z',
+E:'M30-52H-30V52H30M-30 0H18',
+F:'M30-52H-30V52M-30 0H18',
+G:'M32-34C22-50 8-54-2-54C-28-54-38-26-38 0C-38 26-28 54-2 54C16 54 34 44 34 18V6H4',
+H:'M-30-52V52M30-52V52M-30 0H30',
+I:'M0-52V52M-20-52H20M-20 52H20',
+J:'M-6-52H28M18-52V22C18 44 8 54-6 54C-20 54-30 44-32 30',
+K:'M-30-52V52M30-52L-30 8M-10-6L32 52',
+L:'M-28-52V52H30',
+M:'M-38 52V-52L0 18L38-52V52',
+N:'M-30 52V-52L30 52V-52',
+O:'M0-54C26-54 38-28 38 0C38 28 26 54 0 54C-26 54-38 28-38 0C-38-28-26-54 0-54Z',
+P:'M-28 52V-52H4C40-52 40 6 4 6H-28',
+Q:'M0-54C26-54 38-28 38 0C38 28 26 54 0 54C-26 54-38 28-38 0C-38-28-26-54 0-54ZM10 22L38 56',
+R:'M-28 52V-52H4C40-52 40 6 4 6H-28M4 6L32 52',
+S:'M30-36C24-48 12-54 0-54C-18-54-32-44-32-28C-32 4 32-4 32 26C32 44 18 54 0 54C-14 54-26 48-32 36',
+T:'M-34-52H34M0-52V52',
+U:'M-30-52V16C-30 40-16 54 0 54C16 54 30 40 30 16V-52',
+V:'M-36-52L0 52L36-52',
+W:'M-42-52L-22 52L0-8L22 52L42-52',
+X:'M-32-52L32 52M32-52L-32 52',
+Y:'M-34-52L0 4L34-52M0 4V52',
+Z:'M-30-52H30L-30 52H30'};
+const glyphSVG=(L,inlay)=>{const d=GLYPH[L]||GLYPH.A;return `<path d="${d}" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>`+(inlay?`<path d="${d}" fill="none" stroke="${P}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`:'')};
 
 const MOTIFS=[
  {id:'uroko',cat:'patterns',name:'Mitsu-uroko',en:'Three Scales',jp:'三つ鱗',kw:['protection','strength'],
@@ -723,6 +758,9 @@ const MOTIFS=[
  `<circle cx="-40" cy="2" r="3.6" fill="${P}"/><path d="M-16 30C-12 42-4 48 4 48C2 40 0 34-6 30Z" ${sep}/>`+
  `<path d="M-22-34C-22-48-28-56-36-60M-22-34C-22-50-16-58-6-62M-22-34V-64" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/></g>`,
   text:"A whale blowing a spout of water — the giant of the sea, drawn round and friendly."},
+ {id:'initial',cat:'modern',orig:1,name:'Initial',en:'Your Initial',jp:'頭文字',kw:['identity','legacy'],
+  svg:o=>`<g transform="scale(.92)">${glyphSVG((o&&o.letter)||'A',!(o&&o.lstyle==='solid'))}</g>`,
+  text:'Your initial, drawn with the bold, rounded line of a crest. Japan has a long tradition of crests made from written characters (moji-mon); here the same idea meets the Latin alphabet.'},
 ];
 
 const PRESETS=[
@@ -740,25 +778,25 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
  const sc=f((motifOnly?1.15:fr.fit)*s.size/100);
  const bg=transparent?'':`<rect width="200" height="200" fill="${s.paper}"/>`;
  const frame=motifOnly||!fr.d?'':`<path d="${fr.d}" fill-rule="evenodd"/>`;
- let motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg()}</g>`;
+ let motif=frameOnly?'':`<g transform="rotate(${s.rot}) scale(${sc})">${mo.svg(s)}</g>`;
  if(motif&&mo.clip){const id='k'+(++CID);const inner=motifOnly?circ(90):(fr.inner||circ(90));motif=`<clipPath id="${id}"><path d="${inner}"/></clipPath><g clip-path="url(#${id})">${motif}</g>`}
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}">${bg}<g transform="translate(100 100)" fill="${s.ink}" color="${s.ink}">${frame}${motif}</g></svg>`
   .replace(/var\(--p\)/g,s.paper);
 }
 
-const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false};
+const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'inlay'};
 const SITE='https://elkinostudio.github.io/kamon-maker/';
 const HEX=/^[0-9a-f]{6}$/i;
-const encodeShare=o=>[o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0].join('.');
-const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr]=String(str||'').split('.');
+const encodeShare=o=>[o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0].concat(o.motif==='initial'?[(o.letter||'A')+(o.lstyle==='solid'?'s':'i')]:[]).join('.');
+const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr,lt]=String(str||'').split('.');
  if(!FRAMES.some(x=>x.id===fr)||!MOTIFS.some(x=>x.id===mo)||!HEX.test(ink||'')||!HEX.test(pa||''))return null;
  const size=Math.min(130,Math.max(50,+sz||100)),rot=((Math.round(+ro||0)%360)+360)%360,i='#'+ink.toLowerCase(),q='#'+pa.toLowerCase();
- const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1'}};
+ const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1',...(/^[A-Z][is]$/.test(lt||'')?{letter:lt[0],lstyle:lt[1]==='s'?'solid':'inlay'}:{})}};
 const fromURL=(()=>{try{return decodeShare(new URLSearchParams(location.search).get('c'))}catch(e){return null}})();
 const shareURL=o=>SITE+'?c='+encodeShare(o);
-const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';return o}catch(e){return DEFAULT}};
+const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';if(!/^[A-Z]$/.test(o.letter||''))o.letter='A';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
-const UPRIGHT=new Set(["neko","nikukyu","shiba","kitsune","kingyo","fukuro","tsukineko","fujinami","nagareboshi","kujira", "chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
+const UPRIGHT=new Set(["initial", "neko","nikukyu","shiba","kitsune","kingyo","fukuro","tsukineko","fujinami","nagareboshi","kujira", "chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
 const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const andList=k=>k.length>2?k.slice(0,-1).join(', ')+', and '+k.at(-1):k.join(' and ');
@@ -792,14 +830,14 @@ function App(){
    else if(e.key==='r'||e.key==='R')randomize();else return;e.preventDefault()};
   addEventListener('keydown',k);return()=>removeEventListener('keydown',k)},[step]);
 
- const fr=FRAMES.find(x=>x.id===s.frame),mo=MOTIFS.find(x=>x.id===s.motif);
+ const fr=FRAMES.find(x=>x.id===s.frame),mo0=MOTIFS.find(x=>x.id===s.motif),mo=mo0.id==='initial'?{...mo0,jp:s.letter,name:'Initial '+s.letter,en:'Letter '+s.letter}:mo0;
  useEffect(()=>{setCat(mo.cat)},[mo.id]);
  useEffect(()=>{try{document.querySelector('.cats [aria-selected=true]')?.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}},[cat]);
  const preview=useMemo(()=>buildSVG(s,{size:600}),[s]);
  const kws=[...mo.kw,...(fr.kw||[])];
- const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}`;
+ const fname=`kamon-${fr.id==='none'?'':fr.id+'-'}${mo.id}${mo.id==='initial'?'-'+s.letter:''}`;
 
- function randomize(){const p=pick(PRESETS),m=pick(MOTIFS).id;setS(o=>({...o,frame:pick(FRAMES).id,motif:m,size:85+Math.round(Math.random()*5)*5,rot:upr(m,pick([0,0,0,0,15,30,45,90,180])),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
+ function randomize(){const p=pick(PRESETS),m=pick(MOTIFS).id;setS(o=>({...o,letter:m==='initial'?pick([...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']):o.letter,frame:pick(FRAMES).id,motif:m,size:85+Math.round(Math.random()*5)*5,rot:upr(m,pick([0,0,0,0,15,30,45,90,180])),ink:p.ink,paper:p.paper,preset:p.id}));setPop(n=>n+1)}
  async function save(filename,data,fallback){const d=dl.current;
   if(d){try{await d.save({filename,data});done(filename);return}catch(e){if(e?.code==='declined'){setToast('Download cancelled');return}if(e?.code==='rate_limited'){setToast('One moment — try again');return}}}
   if(!window.claude){/* standalone (e.g. GitHub Pages): plain browser download */
@@ -858,6 +896,7 @@ function App(){
     <div class="grid">${FRAMES.map(x=>opt('frame',x,buildSVG({...thumbS,frame:x.id},{size:46,frameOnly:x.id!=='none'}),x.name+(x.en?' — '+x.en:'')))}</div></section>
 
    <section class="panel p-motif" hidden=${hid('motif')}><h3>Center motif <em>${mo.name} · ${mo.en}</em></h3>
+    ${s.motif==='initial'&&html`<div class="letterrow"><label>Letter <input class="letterin" value=${s.letter} maxlength="1" autocapitalize="characters" aria-label="Your letter, A to Z" onFocus=${e=>e.target.select()} onInput=${e=>{const v=(e.target.value||'').toUpperCase().replace(/[^A-Z]/g,'').slice(-1);if(v)set({letter:v});e.target.value=v||s.letter}}/></label><div class="seg" role="group" aria-label="Letter style"><button aria-pressed=${s.lstyle!=='solid'} onClick=${()=>set({lstyle:'inlay'})}>Inlay</button><button aria-pressed=${s.lstyle==='solid'} onClick=${()=>set({lstyle:'solid'})}>Solid</button></div></div>`}
     <div class="cats" role="tablist" aria-label="Motif categories">${CATS.map(([id,l,j])=>html`<button key=${id} role="tab" aria-selected=${cat===id} onClick=${()=>setCat(id)}><span>${l}</span><small>${j}</small></button>`)}</div>
     <div class="grid m">${MOTIFS.filter(x=>x.cat===cat).map(x=>opt('motif',x,buildSVG({...thumbS,motif:x.id},{size:46,motifOnly:true}),x.name+' — '+x.en))}</div></section>
 
