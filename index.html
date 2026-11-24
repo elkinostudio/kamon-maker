@@ -796,7 +796,7 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
   .replace(/var\(--p\)/g,s.paper);
 }
 
-const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'brush',dx:0,dy:0,m2:'',s2:45,r2:0,x2:0,y2:0};
+const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'brush',v:2,dx:0,dy:0,m2:'',s2:45,r2:0,x2:0,y2:0};
 const SITE='https://elkinostudio.github.io/kamon-maker/';
 const HEX=/^[0-9a-f]{6}$/i;
 const encodeShare=o=>{const x=[];if(o.motif==='initial'||o.m2==='initial')x.push((o.letter||'A')+({solid:'s',inlay:'i'}[o.lstyle]||'b'));if(o.dx||o.dy)x.push('o'+o.dx+'~'+o.dy);if(o.m2)x.push('b'+[o.m2,o.s2,o.r2,o.x2,o.y2].join('~'));return [o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0,...x].join('.')};
@@ -810,7 +810,7 @@ const decodeShare=str=>{const [fr,mo,sz,ro,ink,pa,tr,...ex]=String(str||'').spli
  const pr=PRESETS.find(x=>x.ink===i&&x.paper===q);return {frame:fr,motif:mo,size,rot,ink:i,paper:q,preset:pr?pr.id:'',transparent:tr==='1',...decodeExtra(ex)}};
 const fromURL=(()=>{try{return decodeShare(new URLSearchParams(location.search).get('c'))}catch(e){return null}})();
 const shareURL=o=>SITE+'?c='+encodeShare(o);
-const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const o={...DEFAULT,...JSON.parse(localStorage.getItem('kamon')||'{}')};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';if(!/^[A-Z]$/.test(o.letter||''))o.letter='A';if(o.m2&&!MOTIFS.some(m=>m.id===o.m2))o.m2='';return o}catch(e){return DEFAULT}};
+const load=()=>{try{if(fromURL)return {...DEFAULT,...fromURL};const sv=JSON.parse(localStorage.getItem('kamon')||'{}'),o={...DEFAULT,...sv};if(!MOTIFS.some(m=>m.id===o.motif))o.motif='uroko';if(!FRAMES.some(m=>m.id===o.frame))o.frame='maru';if(!/^[A-Z]$/.test(o.letter||''))o.letter='A';if(o.m2&&!MOTIFS.some(m=>m.id===o.m2))o.m2='';if((sv.v||0)<2){o.lstyle='brush';o.v=2}if(!['brush','inlay','solid'].includes(o.lstyle))o.lstyle='brush';return o}catch(e){return DEFAULT}};
 const KOFI_URL='https://ko-fi.com/monojapan';
 const UPRIGHT=new Set(["initial", "neko","nikukyu","shiba","kitsune","kingyo","fukuro","tsukineko","fujinami","nagareboshi","kujira", "chidori", "cho", "usagi", "tonbo", "takanoha", "kame", "karigane", "tsuru", "kani", "hato", "fuji", "kumo", "mitsuboshi", "ya", "ogi", "rokumon", "torii", "fune", "uchiwa", "kasa", "gyoyo", "kiri", "tachibana", "kaji", "tsuta", "matsu", "omodaka", "myoga", "ine", "futabaaoi", "ageha", "mukaicho", "futakarigane", "mukaitsuru", "mitsuyama", "hiogi", "mitsumori", "kaede", "sasarindo", "sagarifuji", "kikusui", "seigaiha", "suhama", "izutsu"]);
 const upr=(id,rot)=>UPRIGHT.has(id)?0:rot;
