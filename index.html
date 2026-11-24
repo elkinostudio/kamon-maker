@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kamon Maker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#c8402e">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kamon Maker">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -42,6 +50,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .layers button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 12px;min-height:34px;font-size:12.5px}
 .layers button[aria-pressed=true]{background:var(--sel);border-color:var(--sel);color:var(--selink)}
 .layers .rm{margin-left:auto;color:var(--shu);border-color:transparent}
+.steps{margin:6px 0 10px;padding-left:1.3em;line-height:1.7;font-size:14px}
 .hint{font-size:13px;color:var(--mute);margin:4px 0}
 .orig{font-size:12px;color:var(--shu);margin:0 0 6px;font-weight:500}
 .menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.3);padding:6px;z-index:8;min-width:230px;display:grid}
@@ -798,6 +807,10 @@ function buildSVG(s,{size=1024,transparent=false,frameOnly=false,motifOnly=false
 
 const DEFAULT={frame:'maru',motif:'uroko',size:100,rot:0,ink:'#1c1a17',paper:'#f4eee2',preset:'sumi',transparent:false,letter:'A',lstyle:'brush',v:2,dx:0,dy:0,m2:'',s2:45,r2:0,x2:0,y2:0};
 const SITE='https://elkinostudio.github.io/kamon-maker/';
+let INSTALL=null;try{addEventListener('beforeinstallprompt',e=>{e.preventDefault();INSTALL=e})}catch(e){}
+try{if('serviceWorker' in navigator&&/github\.io$/.test(location.hostname))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}catch(e){}
+const STANDALONE=(()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}})();
+const IOS=(()=>{try{return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}catch(e){return false}})();
 const HEX=/^[0-9a-f]{6}$/i;
 const encodeShare=o=>{const x=[];if(o.motif==='initial'||o.m2==='initial')x.push((o.letter||'A')+({solid:'s',inlay:'i'}[o.lstyle]||'b'));if(o.dx||o.dy)x.push('o'+o.dx+'~'+o.dy);if(o.m2)x.push('b'+[o.m2,o.s2,o.r2,o.x2,o.y2].join('~'));return [o.frame,o.motif,o.size,o.rot,o.ink.slice(1),o.paper.slice(1),o.transparent?1:0,...x].join('.')};
 const clampN=(v,a,b,d)=>{v=Math.round(+v);return Number.isFinite(v)?Math.min(b,Math.max(a,v)):d};
@@ -889,7 +902,7 @@ function App(){
     <a class="btn kofi" href="https://ko-fi.com/monojapan" target="_blank" rel="noopener" aria-label="Support mono Japan on Ko-fi"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3 6h14v7a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V6zm14 1h1.5a3 3 0 0 1 0 6H17v-2h1.5a1 1 0 0 0 0-2H17V7z"/><path fill="#ff5e5b" d="M10 9.2c.9-1.2 2.9-.6 2.6 1-.2 1.1-1.6 2-2.6 2.6-1-.6-2.4-1.5-2.6-2.6-.3-1.6 1.7-2.2 2.6-1z"/></svg><span class="hide-s">Support</span></a>
     <a class="btn yt" href="https://www.youtube.com/@mono_Japan" target="_blank" rel="noopener" aria-label="mono Japan on YouTube"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#e62117" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8z"/><path fill="#fff" d="M9.8 15.1V8.9l5.4 3.1z"/></svg><span class="hide-m">YouTube</span></a>
     <div class="savewrap"><button class="btn" aria-haspopup="menu" aria-expanded=${smenu} aria-label="Share your crest" onClick=${e=>{e.stopPropagation();setMenu(false);setSmenu(m=>!m)}}><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="hide-s">Share</span></button>
-     ${smenu&&html`<div class="menu" role="menu"><button role="menuitem" onClick=${()=>{setSmenu(false);copyLink()}}><b>Copy link</b><span>Anyone who opens it sees this crest</span></button><button role="menuitem" onClick=${()=>{setSmenu(false);postX()}}><b>Post on X</b><span>Share with a link to your crest</span></button>${typeof navigator!=='undefined'&&navigator.share&&html`<button role="menuitem" onClick=${()=>{setSmenu(false);nativeShare()}}><b>More…</b><span>Instagram, LINE, Messages and others</span></button>`}</div>`}</div>
+     ${smenu&&html`<div class="menu" role="menu"><button role="menuitem" onClick=${()=>{setSmenu(false);copyLink()}}><b>Copy link</b><span>Anyone who opens it sees this crest</span></button><button role="menuitem" onClick=${()=>{setSmenu(false);postX()}}><b>Post on X</b><span>Share with a link to your crest</span></button>${typeof navigator!=='undefined'&&navigator.share&&html`<button role="menuitem" onClick=${()=>{setSmenu(false);nativeShare()}}><b>More…</b><span>Instagram, LINE, Messages and others</span></button>`}${!STANDALONE&&html`<button role="menuitem" onClick=${async()=>{setSmenu(false);if(INSTALL){try{INSTALL.prompt();await INSTALL.userChoice}catch(e){}INSTALL=null}else setModal({type:'install'})}}><b>Add to Home Screen</b><span>Use Kamon Maker like an app, even offline</span></button>`}</div>`}</div>
     <div class="savewrap"><button class="btn ink" aria-haspopup="menu" aria-expanded=${menu} onClick=${e=>{e.stopPropagation();setSmenu(false);setMenu(m=>!m)}}>Save<span aria-hidden="true">▾</span></button>
      ${menu&&html`<div class="menu" role="menu"><button role="menuitem" onClick=${()=>{setMenu(false);savePNG()}}><b>PNG</b><span>1024 × 1024 · for icons & social</span></button><button role="menuitem" onClick=${()=>{setMenu(false);saveSVG()}}><b>SVG</b><span>Vector · scales to any size</span></button></div>`}</div>
    </div>
@@ -951,8 +964,8 @@ function App(){
   </main>
 
   ${modal&&html`<div class="modal" onClick=${e=>{if(e.target===e.currentTarget)setModal(null)}}><div class="box">
-   <h3>${modal.type==='png'?'Save your PNG':modal.type==='link'?'Share link':'Your SVG'}</h3>
-   ${modal.type==='link'?html`<input readonly style=${{width:'100%',font:'13px monospace',borderRadius:'8px',padding:'10px',border:'1px solid var(--line)'}} value=${modal.url} onFocus=${e=>e.target.select()}/><p>Copy this link and paste it anywhere.</p>`:modal.type==='png'?html`<img src=${modal.src} alt="Your crest, 1024 by 1024 PNG"/><p>Downloads aren’t available in this view. Long-press (phone) or right-click (desktop) the image to save it.</p>`
+   <h3>${modal.type==='png'?'Save your PNG':modal.type==='link'?'Share link':modal.type==='install'?'Add to Home Screen':'Your SVG'}</h3>
+   ${modal.type==='install'?html`<ol class="steps">${IOS?html`<li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button <span aria-hidden="true">(□↑)</span>.</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li>`:html`<li>Open your browser menu <span aria-hidden="true">(⋮)</span>.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li>`}</ol><p>Kamon Maker then opens full-screen from its own icon and keeps working offline.</p>`:modal.type==='link'?html`<input readonly style=${{width:'100%',font:'13px monospace',borderRadius:'8px',padding:'10px',border:'1px solid var(--line)'}} value=${modal.url} onFocus=${e=>e.target.select()}/><p>Copy this link and paste it anywhere.</p>`:modal.type==='png'?html`<img src=${modal.src} alt="Your crest, 1024 by 1024 PNG"/><p>Downloads aren’t available in this view. Long-press (phone) or right-click (desktop) the image to save it.</p>`
     :html`<textarea readonly style=${{width:'100%',height:'160px',font:'12px monospace',borderRadius:'8px',padding:'8px'}} value=${modal.text}></textarea><button class="btn ink" onClick=${()=>copySVG(modal.text)}>Copy SVG code</button>`}
    <button class="btn" onClick=${()=>setModal(null)}>Close</button></div></div>`}
   ${thanks&&html`<aside class="thanks" role="dialog" aria-label="Thank you"><button class="x" aria-label="Close" onClick=${()=>setThanks(false)}>×</button>

@@ -17,6 +17,7 @@ Design your own Japanese family crest (*kamon*) in the browser. Pick an outer fr
 - **Traditional colour presets** plus free colour pickers, with an optional transparent background
 - **Meaning & origin card** that describes your combination in English
 - **Randomize** with one tap
+- **Install as an app** — "Add to Home Screen" from the Share menu; works offline
 - **Share link** — copy a link or post on X; whoever opens it sees your exact crest
 - **Download** as PNG (1024×1024, ideal for social media icons) or SVG
 - **One screen, no scrolling** — tabbed tool tray on phones, three-column workbench on desktop
